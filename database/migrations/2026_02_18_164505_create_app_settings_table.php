@@ -27,7 +27,7 @@ return new class extends Migration {
             'secondary_color' => '#6c757d',
             'sidebar_color' => '#212529',
             'background_color' => '#f6f7fb',
-            'text_color' => '#000000',
+            'text_color' => '#ffffff',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

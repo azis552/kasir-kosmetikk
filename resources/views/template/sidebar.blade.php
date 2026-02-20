@@ -223,7 +223,7 @@
     <nav class="pc-sidebar">
         <div class="navbar-wrapper">
             <div class="m-header">
-                <a href="{{ route('home') }}" class="b-brand text-primary">
+                <a href="" class="b-brand text-primary">
                     <!-- ========   Change your logo from here   ============ -->
                     <img src="{{ store_logo('app_dark') }}" class="img-fluid" width="50px" alt="logo" />
                     <strong class="pc-link" for="">{{ store_name('full') }}</strong>
