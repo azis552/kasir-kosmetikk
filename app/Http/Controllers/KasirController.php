@@ -17,7 +17,7 @@ class KasirController extends Controller
     /**
      * Display a listing of the resource.
      */
-    protected int $idleMinutes = 15;
+    protected int $idleMinutes = 1440; // 24 jam x 60 menit
 
     public function index()
     {
