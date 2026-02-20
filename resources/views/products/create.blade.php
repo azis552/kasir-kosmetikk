@@ -29,19 +29,16 @@
                         <h4 class="mb-4">Tambah Produk</h4>
 
                         <div class="row mb-3">
+                             <div class="col-md-6">
+                                <label for="barcode" class="form-label">Barcode</label>
+                                <input type="text" class="form-control" name="barcode" id="barcode">
+                                <span>Contoh: 123456789 </span>
+                            </div>
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Nama Produk</label>
                                 <input type="text" class="form-control" name="name" id="name" required>
                             </div>
-                            <div class="col-md-6">
-                                <label for="category_id" class="form-label">Kategori Produk</label>
-                                <select class="form-control" name="category_id" id="category_id" required>
-                                    <option value="">-- Pilih Kategori --</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                          
                         </div>
 
                         <div class="row mb-3">
@@ -80,10 +77,14 @@
                                 <label for="sku" class="form-label">SKU</label>
                                 <input type="text" class="form-control" name="sku" id="sku">
                             </div>
-                            <div class="col-md-6">
-                                <label for="barcode" class="form-label">Barcode</label>
-                                <input type="text" class="form-control" name="barcode" id="barcode">
-                                <span>Contoh: 123456789 Lakukan terakhir isi yang lain dulu</span>
+                             <div class="col-md-6">
+                                <label for="category_id" class="form-label">Kategori Produk</label>
+                                <select class="form-control" name="category_id" id="category_id" required>
+                                    <option value="">-- Pilih Kategori --</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
