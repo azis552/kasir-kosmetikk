@@ -27,7 +27,10 @@ class ProductController extends Controller
 
         // Pencarian berdasarkan nama role
         if ($search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('barcode', 'like', "%{$search}%");
+            });
         }
 
         // Pengurutan berdasarkan kolom dan arah
@@ -56,13 +59,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-
-        $price = str_replace(['Rp', '.', ',', ' '], ['', '', '', ''], $request->input('price'));
+        $price = str_replace(['Rp', '.', ',', ' '], ['', '', '', ''], $request->input('price_sell'));
         $price_buy = str_replace(['Rp', '.', ',', ' '], ['', '', '', ''], $request->input('price_buy'));
         $request->merge(['price' => $price, 'price_buy' => $price_buy]);
         $validator = Validator::make($request->all(), [
             'barcode' => 'required|string|max:50|unique:products,barcode',
-            'sku' => 'required|string|max:50|unique:products,sku',
+            'sku' => 'string|max:50|unique:products,sku',
             'name' => 'required|string|max:120',
             'category_id' => 'required|exists:product_categories,id',
             'price' => 'required|numeric|min:0',
@@ -106,7 +108,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $price = str_replace(['Rp', '.', ',', ' '], ['', '', '', ''], $request->input('price'));
+        $price = str_replace(['Rp', '.', ',', ' '], ['', '', '', ''], $request->input('price_sell'));
         $price_buy = str_replace(['Rp', '.', ',', ' '], ['', '', '', ''], $request->input('price_buy'));
         $request->merge(['price' => $price, 'price_buy' => $price_buy]);
         $product = Products::findOrFail($id);

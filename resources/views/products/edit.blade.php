@@ -57,7 +57,7 @@
                                 <input type="text" class="form-control"
                                     value="{{ App\Helpers\FormatHelper::formatRupiah($product->price) }}"
                                     placeholder="{{ App\Helpers\FormatHelper::formatRupiah($product->price) }}"
-                                    name="price" id="price" required>
+                                    name="price_sell" id="price" required>
                             </div>
                             <div class="col-md-4">
                                 <label for="min_stock" class="form-label">Min Stok</label>
@@ -68,7 +68,7 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="unit" class="form-label">Unit</label>
+                                <label for="unit" class="form-label">Satuan</label>
                                 <input type="text" class="form-control" name="unit" value="{{ $product->unit }}"
                                     id="unit" required>
                             </div>

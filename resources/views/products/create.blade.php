@@ -47,8 +47,8 @@
                                 <input type="text" class="form-control" name="price_buy" id="price_buy" required>
                             </div>
                             <div class="col-md-4">
-                                <label for="price" class="form-label">Harga</label>
-                                <input type="text" class="form-control" name="price" id="price" required>
+                                <label for="price" class="form-label">Harga Jual</label>
+                                <input type="text" class="form-control" name="price_sell" id="price" required>
                             </div>
                             
                             <div class="col-md-4">
@@ -59,7 +59,7 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="unit" class="form-label">Unit</label>
+                                <label for="unit" class="form-label">Satuan</label>
                                 <input type="text" class="form-control" name="unit" id="unit" required>
                             </div>
                             <div class="col-md-6">
@@ -74,7 +74,7 @@
                         <div class="row mb-3">
                             
                             <div class="col-md-6">
-                                <label for="sku" class="form-label">SKU</label>
+                                <label for="sku" class="form-label">SKU <span>(Opsional)</span></label>
                                 <input type="text" class="form-control" name="sku" id="sku">
                             </div>
                              <div class="col-md-6">

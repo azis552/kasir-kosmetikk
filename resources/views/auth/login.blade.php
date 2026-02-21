@@ -140,8 +140,3 @@
 <!-- [Body] end -->
 
 </html>
-<script>
-    setTimeout(function () {
-        window.location.href = '/';
-    }, 15000); 
-</script>

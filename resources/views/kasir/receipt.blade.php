@@ -2,181 +2,185 @@
 <html>
 <head>
     <title>Struk</title>
+
     <style>
-        body {
-            font-family: monospace;
+        @page {
+            size: 58mm auto;
             margin: 0;
-            padding: 10px;
-            font-size: 12px;
+top-margin:0;
         }
 
-        /* HEADER FLEX */
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+        body {
+            width: 52mm;              /* 🔴 AMAN: tidak melebar */
+            margin: 0;
+margin-right: 1mm;
+	    margin-left:0.2mm;
+            padding: 0;
+
+            font-family: arial;
+            font-size: 11px;
+            line-height: 1.1;
         }
 
-        .logo img {
-            height: 60px;
-            object-fit: contain;
+        * {
+            box-sizing: border-box;
         }
 
-        .store-info {
-            flex: 1;
-            line-height: 1.3;
-        }
-
-        .store-name {
-            font-weight: bold;
-            font-size: 14px;
-        }
+        .center { text-align: center; }
+        .right  { text-align: right; }
+        .bold   { font-weight: bold; }
 
         .line {
             border-top: 1px dashed #000;
-            margin: 6px 0;
+            margin: 1px 0;
         }
 
-        table {
+        /* ===== ROW TANPA TABLE ===== */
+        .row {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
+            clear: both;
         }
 
-        td {
-            padding: 2px 0;
-            vertical-align: top;
+        .left {
+            float: left;
+            width: 60%;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .right {
+            float: right;
+            width: 40%;
             text-align: right;
+            white-space: nowrap;
+margin-right: 2mm;
         }
 
-        .bold {
+        .clear {
+            clear: both;
+        }
+
+        .item-name {
+	    margin-left : 5mm;
             font-weight: bold;
-        }
-
-        @media print {
-            body {
-                margin: 0;
-                padding: 5px;
-            }
         }
     </style>
 </head>
+
 <body onload="window.print()">
 
-    {{-- HEADER --}}
-    <div class="header">
+<!-- ===== HEADER ===== -->
+<div class="center">
+    @if(store_logo('app_light'))
+        <img src="{{ store_logo('app_light') }}" style="max-width:25mm;">
+    @endif
 
-        {{-- LOGO KIRI --}}
-        @if(store_logo('receipt'))
-            <div class="logo">
-                <img src="{{ store_logo('receipt') }}">
-            </div>
-        @endif
+    <div class="bold">{{ strtoupper(store_name()) }}</div>
+    <div style="margin-left:2mm">{{ store_address() }}</div>
+    <div>{{ store_phone() }}</div>
+    <div>{{ store_email() }}</div>
 
-        {{-- HEADER KANAN --}}
-        <div class="store-info">
-            <div class="store-name">
-                {{ strtoupper(store_name()) }}
-            </div>
+    @if(store_receipt_header())
+        <div>{{ store_receipt_header() }}</div>
+    @endif
+</div>
 
-            {{ store_address() }}<br>
-            {{ store_phone() }}<br>
-            {{ store_email() }}<br>
+<div class="line"></div>
 
-            @if(store_receipt_header())
-                {{ store_receipt_header() }}
-            @endif
-        </div>
+<!-- ===== INFO TRANSAKSI ===== -->
+<table style="margin-left:2mm;margin-right:2mm;width:100%; border-collapse:collapse; font-size:11px;">
+    <tr>
+        <td class="item-name" style="padding:0;">No</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ $transaction->transaction_code }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Pelanggan</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ $transaction->pelanggan_name ?? '-' }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Tanggal</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ $transaction->created_at->format('d-m-Y H:i') }}
+        </td>
+    </tr>
+</table>
 
-    </div>
+<div class="line"></div>
 
-    <div class="line"></div>
+<!-- ===== ITEM ===== -->
+@foreach($details as $detail)
+<table style="margin-left:2mm;margin-right:5mm;width:100%; border-collapse:collapse; font-size:11px;">
+    <tr>
+        <td colspan="2" class="item-name" style="padding:0; font-weight:bold;">
+            {{ $detail->product->name }}
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:0;">
+            {{ $detail->quantity }} x {{ number_format($detail->price,0,',','.') }}
+        </td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($detail->line_total,0,',','.') }}
+        </td>
+    </tr>
+</table>
+@endforeach
 
-    {{-- INFO TRANSAKSI --}}
-    <table>
-        <tr>
-            <td>No</td>
-            <td>:</td>
-            <td>{{ $transaction->transaction_code }}</td>
-        </tr>
-        <tr>
-            <td>Pelanggan</td>
-            <td>:</td>
-            <td>{{ $transaction->pelanggan_name ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>Tanggal</td>
-            <td>:</td>
-            <td>{{ $transaction->created_at->format('d-m-Y H:i') }}</td>
-        </tr>
-    </table>
+<div class="line"></div>
 
-    <div class="line"></div>
+<!-- ===== TOTAL ===== -->
+<table style="margin-left:2mm;margin-right:2mm;width:100%; border-collapse:collapse; font-size:11px;">
+    <tr>
+        <td class="item-name" style="padding:0;">Subtotal</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($transaction->subtotal,0,',','.') }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Diskon</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($transaction->diskon_item,0,',','.') }}
+        </td>
+    </tr>
+    <tr style="font-weight:bold;">
+        <td class="item-name" style="padding:0;">Total</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($transaction->total,0,',','.') }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Dibayar</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($transaction->dibayar,0,',','.') }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Kembalian</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($transaction->kembalian,0,',','.') }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Metode</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ strtoupper($transaction->payment_method) }}
+        </td>
+    </tr>
+</table>
 
-    {{-- ITEM --}}
-    @foreach($details as $detail)
-        <div>
-            <strong>{{ $detail->product->name }}</strong><br>
-            {{ $detail->quantity }} x Rp {{ number_format($detail->price,0,',','.') }}
-            <span class="right" style="float:right">
-                Rp {{ number_format($detail->line_total,0,',','.') }}
-            </span>
-        </div>
-        <div style="clear: both;"></div>
-    @endforeach
+<div class="line"></div>
 
-    <div class="line"></div>
-
-    {{-- TOTAL --}}
-    <table>
-        <tr>
-            <td>Subtotal</td>
-            <td class="right">Rp {{ number_format($transaction->subtotal,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td>Diskon</td>
-            <td class="right">Rp {{ number_format($transaction->diskon_item,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td>Voucher</td>
-            <td class="right">Rp {{ number_format($transaction->potongan_voucher,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td>PPN {{ $transaction->tax }}%</td>
-            <td class="right">Rp {{ number_format($transaction->tax_amount,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td class="bold">TOTAL</td>
-            <td class="right bold">Rp {{ number_format($transaction->total,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td>Dibayar</td>
-            <td class="right">Rp {{ number_format($transaction->dibayar,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td>Kembalian</td>
-            <td class="right">Rp {{ number_format($transaction->kembalian,0,',','.') }}</td>
-        </tr>
-        <tr>
-            <td>Metode</td>
-            <td class="right">{{ strtoupper($transaction->payment_method) }}</td>
-        </tr>
-    </table>
-
-    <div class="line"></div>
-
-    {{-- FOOTER --}}
-    <div style="text-align:center; margin-top:5px;">
-        @if(store_receipt_footer())
-            {{ store_receipt_footer() }}<br>
-        @endif
-
-        Terima kasih atas kunjungan Anda
-    </div>
+<!-- ===== FOOTER ===== -->
+<div class="center">
+    @if(store_receipt_footer())
+        {{ store_receipt_footer() }}<br>
+    @endif
+    Terima kasih atas kunjungan Anda
+</div>
 
 </body>
 </html>

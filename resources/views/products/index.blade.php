@@ -23,8 +23,8 @@
 
                     <!-- Form Pencarian -->
                     <form action="{{ route('products.index') }}" method="GET" class="d-flex form-inline mb-3">
-                        <input type="text" name="search" class="form-control" placeholder="Search by Product Name..."
-                            value="{{ request()->search }}">
+                        <input type="text" name="search" class="form-control" placeholder="Search by Product Barcode, Name..."
+                            value="{{ request()->search }}" autofocus>
                         <button type="submit" class="btn btn-primary ml-2">Search</button>
                     </form>
 <div class="table-responsive">
@@ -51,7 +51,7 @@
                                 <th>Harga Jual</th>
                                 <th>Stok</th>
                                 <th>Min Stok</th>
-                                <th>Unit</th>
+                                <th>Satuan</th>
                                 <th>Status</th>
                                 
                                 <th>Actions</th>

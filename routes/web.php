@@ -42,6 +42,8 @@ Route::middleware(['auth', 'log.user.activity'])->group(function () {
 
 });
 Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function () {
+    
+    Route::resource('products', ProductController::class);
     // Menampilkan daftar pengguna
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     // Form untuk membuat pengguna baru
@@ -59,7 +61,6 @@ Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function (
     Route::PUT('products/{product}/diskon', [ProductController::class, 'storeDiskon'])->name('products.storeDiskon');
     Route::get('products/{product}/diskon', [ProductController::class, 'diskon'])->name('products.diskon');
     Route::put('products/updateStock/{product}', [ProductController::class, 'updateStock'])->name('products.updateStock');
-    Route::resource('products', ProductController::class);
     Route::get('products/{product}/stock', [ProductController::class, 'stock'])->name('products.stock');
     Route::resource('diskon', DiskonController::class);
     Route::resource('vouchers', VoucherController::class);
