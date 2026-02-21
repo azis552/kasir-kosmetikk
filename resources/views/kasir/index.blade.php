@@ -92,7 +92,7 @@
         .qty-input {
             width: 78px;
         }
-        
+
 
         @media (max-width: 991.98px) {
             .sticky-right {
@@ -121,13 +121,7 @@
                                 </div>
 
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-secondary" id="btnReload" type="button">
-                                        🔄 Reload
-                                    </button>
-
-                                    <button class="btn btn-outline-primary" id="btnDashboard" type="button">
-                                        🏠 Dashboard
-                                    </button>
+                                    
 
                                     <button class="btn btn-outline-danger" id="batal" type="button">
                                         Batal Transaksi
@@ -339,9 +333,10 @@
                         swal.fire({
                             icon: 'error',
                             title: 'Gagal menambahkan produk',
-                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menambahkan produk.',
+                            text: xhr.responseJSON.message || 'Produk tidak ditemukan atau stok habis.',
                             timer: 1000,
                         });
+                        $('#barcodeInput').val('').focus();
                     },
                     complete: function () {
                         window.loadingTambah = false;
@@ -380,7 +375,12 @@
                         $('#voucherDiscount').text(0);
                     },
                     error: function (xhr) {
-                        alert('Error menghapus voucher: ' + xhr.responseText);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal menghapus voucher',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menghapus voucher.',
+                            timer: 1000,
+                        });
                     }
                 });
             })
@@ -404,42 +404,42 @@
                         $('#voucherInfo').html(
 
                             `<div class="d-flex align-items-center gap-2">
-                                                                                                    <button id="btnRemoveVoucher" 
-                                                                                                    data-id="${response.vouchers.id}" 
-                                                                                                    data-transaksi="${response.transactionId}"
-                                                                                                    class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
-                                                                                                </div>`
+                                                                                                        <button id="btnRemoveVoucher" 
+                                                                                                        data-id="${response.vouchers.id}" 
+                                                                                                        data-transaksi="${response.transactionId}"
+                                                                                                        class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
+                                                                                                    </div>`
                         )
                     }
 
 
                     response.items.forEach(function (item) {
                         let row = `<tr>
-                                                                                                        <td>
-                                                                                                            <div class="d-flex align-items-center gap-2">
-                                                                                                                <div>
-                                                                                                                    <div class="fw-semibold">${item.product_name}</div>
-                                                                                                                    <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
+                                                                                                            <td>
+                                                                                                                <div class="d-flex align-items-center gap-2">
+                                                                                                                    <div>
+                                                                                                                        <div class="fw-semibold">${item.product_name}</div>
+                                                                                                                        <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
+                                                                                                                    </div>
                                                                                                                 </div>
-                                                                                                            </div>
-                                                                                                        </td>
-                                                                                                        <td class="text-end money" data-price="${item.price}">${item.price}</td>
-                                                                                                        <td class="text-center">
-                                                                                                            <div class="d-inline-flex align-items-center gap-1">
-                                                                                                                <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
-                                                                                                                <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" style="width:60px;">
-                                                                                                                <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
+                                                                                                            </td>
+                                                                                                            <td class="text-end money" data-price="${item.price}">${item.price}</td>
+                                                                                                            <td class="text-center">
+                                                                                                                <div class="d-inline-flex align-items-center gap-1">
+                                                                                                                    <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
+                                                                                                                    <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" style="width:60px;">
+                                                                                                                    <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
 
 
-                                                                                                            </div>
-                                                                                                        </td>
-                                                                                                        <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
+                                                                                                                </div>
+                                                                                                            </td>
+                                                                                                            <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
 
 
-                                                                                                        <td class="text-center" style="min-width:100px;">
-                                                                                                            <div class="discount-box"
-                                                                                                                data-transaksi="${item.transaction_id}"
-                                                                                                                data-product="${item.product_id}">`;
+                                                                                                            <td class="text-center" style="min-width:100px;">
+                                                                                                                <div class="discount-box"
+                                                                                                                    data-transaksi="${item.transaction_id}"
+                                                                                                                    data-product="${item.product_id}">`;
 
                         const applied = Array.isArray(item.applied_discount_ids) ? item
                             .applied_discount_ids : [];
@@ -455,39 +455,39 @@
 
 
                             row += `
-                                                                                <div class="form-check text-start d-flex align-items-center gap-2">
-                                                                                    <input
-                                                                                        class="form-check-input discount-check"
-                                                                                        type="radio"  
-                                                                                        data-nominal="${totalNominalDiskon}"
-                                                                                        name="discount-${item.product_id}" 
-                                                                                        value="${disc.id}"
-                                                                                        ${checked ? 'checked' : ''}
-                                                                                        ${disabled ? 'disabled' : ''}
-                                                                                    >
-                                                                                    <label class="form-check-label d-flex flex-column gap-1">
-                                                                                        <div class="d-flex align-items-center gap-2">
-                                                                                            <span>${disc.percentage}%</span>
-                                                                                            <span class="badge bg-success">Min ${disc.min_qty}</span>
-                                                                                        </div>
-                                                                                        <small class="text-muted diskon-item">
-                                                                                            -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
-                                                                                        </small>
-                                                                                    </label>
-                                                                                </div>
-                                                                            `;
+                                                                                    <div class="form-check text-start d-flex align-items-center gap-2">
+                                                                                        <input
+                                                                                            class="form-check-input discount-check"
+                                                                                            type="radio"  
+                                                                                            data-nominal="${totalNominalDiskon}"
+                                                                                            name="discount-${item.product_id}" 
+                                                                                            value="${disc.id}"
+                                                                                            ${checked ? 'checked' : ''}
+                                                                                            ${disabled ? 'disabled' : ''}
+                                                                                        >
+                                                                                        <label class="form-check-label d-flex flex-column gap-1">
+                                                                                            <div class="d-flex align-items-center gap-2">
+                                                                                                <span>${disc.percentage}%</span>
+                                                                                                <span class="badge bg-success">Min ${disc.min_qty}</span>
+                                                                                            </div>
+                                                                                            <small class="text-muted diskon-item">
+                                                                                                -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
+                                                                                            </small>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                `;
                             totalNominalDiskon = 0;
                         });
 
 
                         row += `</div>
-                                                                                                        </td>
+                                                                                                            </td>
 
-                                                                                                        <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
-                                                                                                        <td class="text-center">
-                                                                                                            <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
-                                                                                                        </td>
-                                                                                                    </tr>`;
+                                                                                                            <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
+                                                                                                            <td class="text-center">
+                                                                                                                <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
+                                                                                                            </td>
+                                                                                                        </tr>`;
 
                         cartBody.append(row);
 
@@ -666,7 +666,12 @@
                         fetchCart(); // refresh subtotal & total
                     },
                     error: function (xhr) {
-                        alert('Error memperbarui diskon');
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal memperbarui diskon',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat memperbarui diskon.',
+                            timer: 1000,
+                        });
                         checkbox.prop('checked', !checkbox.is(':checked')); // rollback UI
                     }
                 });
@@ -688,7 +693,12 @@
                         fetchCart();
                     },
                     error: function (xhr) {
-                        alert('Error menghapus produk');
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal menghapus produk',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menghapus produk.',
+                            timer: 1000,
+                        });
                     }
                 });
             });
@@ -715,7 +725,12 @@
                     },
                     error: function (xhr) {
                         fetchCart();
-                        alert('Error menambahkan produk: ' + xhr.responseText);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal menambah produk',
+                            text: xhr.responseJSON.message || 'Produk tidak ditemukan atau stok habis.',
+                            timer: 1000,
+                        });
                     }
                 });
             });
@@ -741,7 +756,13 @@
                         fetchCart();
                     },
                     error: function (xhr) {
-                        alert('Error mengurangi produk: ' + xhr.responseText);
+                        fetchCart();
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal mengurangi produk',
+                            text: xhr.responseJSON.message || 'Produk tidak ditemukan atau stok habis.',
+                            timer: 1000,
+                        });
                     }
                 });
             });
@@ -761,12 +782,22 @@
                         fetchCart();
                         if (response.success === false) {
                             {
-                                alert(response.message);
+                                swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal menerapkan voucher',
+                                    text: response.message || 'Voucher tidak valid atau tidak memenuhi syarat.',
+                                    timer: 1000,
+                                });
                             }
                         }
                     },
                     error: function (xhr) {
-                        alert("error" + xhr);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal menerapkan voucher',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menerapkan voucher.',
+                            timer: 1000,
+                        });
                     }
 
                 });
@@ -787,16 +818,33 @@
                 const tax_amount = $('#tax').text().replace(/[^0-9,-]+/g, "").replace(",", "");
 
                 if (paid == "") {
-                    alert("Masukkan Total Pembayaran");
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Gagal melakukan pembayaran',
+                        text: 'Masukkan jumlah pembayaran.',
+                        timer: 1000,
+                    });
                     return false;
                 }
 
                 if (paymentMethod == "") {
-                    alert("Pilih Metode Pembayaran");
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Gagal melakukan pembayaran',
+                        text: 'Pilih Metode Pembayaran.',
+                        timer: 1000,
+                    });
+                    return false;
+                }
                     return false;
                 }
                 if (parseFloat(paid) < parseFloat(grandTotal)) {
-                    alert("Total Pembayaran Kurang");
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Gagal melakukan pembayaran',
+                        text: 'Jumlah pembayaran kurang dari total tagihan.',
+                        timer: 1000,
+                    });
                     return false;
                 }
 
@@ -839,7 +887,12 @@
                         }
                     },
                     error: function (xhr) {
-                        alert("error" + xhr);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal melakukan pembayaran',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat memproses pembayaran.',
+                            timer: 1000,
+                        });
                     }
                 });
             });
@@ -861,7 +914,12 @@
                         location.reload();
                     },
                     error: function (xhr) {
-                        alert("error" + xhr);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal membatalkan transaksi',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat membatalkan transaksi.',
+                            timer: 1000,
+                        });
                     }
                 });
             })
@@ -881,29 +939,29 @@
                 const doc = iframe.contentWindow.document;
                 doc.open();
                 doc.write(`
-                                            <html>
-                                            <head>
-                                                <title>Cetak Struk</title>
-                                                <style>
-                                                    @page {
-                                                        size: 58mm auto;
-                                                        margin: 0;
-                                                    }
-                                                    body {
-                                                        width: 58mm;
-                                                        font-family: monospace;
-                                                        font-size: 11px;
-                                                        white-space: pre;
-                                                        margin: 0;
-                                                        padding: 4px;
-                                                    }
-                                                </style>
-                                            </head>
-                                            <body>
-                                    ${receiptContent}
-                                            </body>
-                                            </html>
-                                        `);
+                                                <html>
+                                                <head>
+                                                    <title>Cetak Struk</title>
+                                                    <style>
+                                                        @page {
+                                                            size: 58mm auto;
+                                                            margin: 0;
+                                                        }
+                                                        body {
+                                                            width: 58mm;
+                                                            font-family: monospace;
+                                                            font-size: 11px;
+                                                            white-space: pre;
+                                                            margin: 0;
+                                                            padding: 4px;
+                                                        }
+                                                    </style>
+                                                </head>
+                                                <body>
+                                        ${receiptContent}
+                                                </body>
+                                                </html>
+                                            `);
                 doc.close();
 
                 iframe.onload = function () {
@@ -914,7 +972,7 @@
             }
 
 
-              $(document).on('click', '#cetak', function () {
+            $(document).on('click', '#cetak', function () {
                 const transactionId = $(this).data('transaksi');
                 window.open(`/kasir/cetak/${transactionId}`, '_blank');
             });
