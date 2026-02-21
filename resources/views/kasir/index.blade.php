@@ -311,7 +311,12 @@
             function submitProduk() {
                 let barcode = $('#barcodeInput').val().trim();
                 if (!barcode) {
-                    alert('Silakan masukkan barcode produk.');
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Gagal menambahkan produk',
+                        text: 'Masukkan barcode atau nama produk.',
+                        timer: 1000,
+                    });
                     return;
                 }
 
@@ -836,8 +841,6 @@
                     });
                     return false;
                 }
-                    return false;
-                }
                 if (parseFloat(paid) < parseFloat(grandTotal)) {
                     swal.fire({
                         icon: 'error',
@@ -1020,66 +1023,7 @@
 
         });
     </script>
-    @role('admin')
-    <script>
 
-        document.addEventListener('DOMContentLoaded', function () {
-
-            /* 🔄 Reload halaman kasir */
-            document.getElementById('btnReload')?.addEventListener('click', function () {
-                location.reload();
-            });
-
-            /* 🏠 Kembali ke Dashboard */
-            document.getElementById('btnDashboard')?.addEventListener('click', function () {
-
-                // hapus mode POS
-                sessionStorage.removeItem('pos_mode');
-
-                // keluar fullscreen (kalau ada)
-                if (document.fullscreenElement) {
-                    document.exitFullscreen().catch(() => { });
-                }
-
-
-
-                // redirect ke dashboard
-                window.location.href = "{{ route('dashboard.admin') }}";
-            });
-
-        });
-    </script>
-    @endrole
-    @role('kasir')
-    <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            /* 🔄 Reload halaman kasir */
-            document.getElementById('btnReload')?.addEventListener('click', function () {
-                location.reload();
-            });
-
-            /* 🏠 Kembali ke Dashboard */
-            document.getElementById('btnDashboard')?.addEventListener('click', function () {
-
-                // hapus mode POS
-                sessionStorage.removeItem('pos_mode');
-
-                // keluar fullscreen (kalau ada)
-                if (document.fullscreenElement) {
-                    document.exitFullscreen().catch(() => { });
-                }
-
-
-
-                // redirect ke dashboard
-                window.location.href = "{{ route('dashboard.kasir') }}";
-            });
-
-        });
-    </script>
-    @endrole
 
 
 @endsection
