@@ -64,7 +64,7 @@ class ProductController extends Controller
         $request->merge(['price' => $price, 'price_buy' => $price_buy]);
         $validator = Validator::make($request->all(), [
             'barcode' => 'required|string|max:50|unique:products,barcode',
-            'sku' => 'string|max:50|unique:products,sku',
+            'sku' => 'max:50',
             'name' => 'required|string|max:120',
             'category_id' => 'required|exists:product_categories,id',
             'price' => 'required|numeric|min:0',

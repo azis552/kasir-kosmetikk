@@ -60,17 +60,17 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="supplier" class="form-label">Supplier</label>
+                                <label for="supplier" class="form-label">Supplier</label> <span>(optional)</span>
                                 <input type="text" class="form-control" name="supplier" id="supplier">
                             </div>
                             <div class="col-md-6">
-                                <label for="ref_nota" class="form-label">Ref Nota</label>
+                                <label for="ref_nota" class="form-label">Ref Nota</label><span>(optional)</span>
                                 <input type="text" class="form-control" name="ref_nota" id="ref_nota">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <label for="description" class="form-label">Deskripsi</label>
+                                <label for="description" class="form-label">Deskripsi</label><span>(optional)</span>
                                 <textarea class="form-control" name="description" id="description" rows="3"></textarea>
                             </div>
                         </div>
