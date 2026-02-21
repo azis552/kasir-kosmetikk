@@ -336,7 +336,12 @@
                         fetchCart();
                     },
                     error: function (xhr) {
-                        alert('Error menambahkan produk: ' + xhr.responseText);
+                        swal.fire({
+                            icon: 'error',
+                            title: 'Gagal menambahkan produk',
+                            text: xhr.responseJSON.message || 'Terjadi kesalahan saat menambahkan produk.',
+                            timer: 1000,
+                        });
                     },
                     complete: function () {
                         window.loadingTambah = false;

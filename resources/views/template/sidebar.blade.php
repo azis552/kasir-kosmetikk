@@ -31,6 +31,7 @@
 
     <!-- Load Inputmask (ensure it's placed after jQuery) -->
     <script src="{{ asset('assets/js/plugins/inputmask.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-14K1GBX9FG"></script>
     <style>
