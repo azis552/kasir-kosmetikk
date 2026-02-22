@@ -151,6 +151,7 @@ class RbacAndUserSeeder extends Seeder
             // theme
             'admin.theme',
             'admin.theme.update',
+            'kasir.batal.paid',
         ];
 
 

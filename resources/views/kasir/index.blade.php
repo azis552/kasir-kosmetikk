@@ -983,27 +983,7 @@ $('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
                 const transactionId = $(this).data('transaksi');
                 window.open(`/kasir/cetak/${transactionId}`, '_blank');
             });
-            $(document).on('keydown', function (e) {
-                if (e.altKey && e.key.toLowerCase() === 'n') {
-                    e.preventDefault();
-                    $('#barcode').focus().select();
-                }
-                if (e.altKey && e.key.toLowerCase() === 'b') {
-                    e.preventDefault();
-                    $('#paid').focus().select();
-                }
-
-                if (e.altKey && e.key.toLowerCase() === 'm') {
-                    e.preventDefault();
-                    $('#paymentMethod').focus();
-                }
-
-                if (e.key === 'F9') {
-                    e.preventDefault();
-                    $('#bayar').click();
-                }
-
-            });
+            
         });
 
     </script>

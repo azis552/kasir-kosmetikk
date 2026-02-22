@@ -17,7 +17,7 @@ class KasirController extends Controller
     /**
      * Display a listing of the resource.
      */
-    protected int $idleMinutes = 1440; // 24 jam x 60 menit
+    protected int $idleMinutes = 60;
 
     public function index()
     {
@@ -573,6 +573,78 @@ class KasirController extends Controller
         $transaction = Transaction::find($id);
         $title = "Detail Transaksi";
         return view('kasir.detail_transaksi', compact('transaction', 'title'));
+    }
+
+    public function batalTransaksiSudahBayar(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $transaction = Transaction::with('details')
+                ->where('id', $request->transactionId)
+                ->where('status', 'PAID')
+                ->first();
+
+            if (!$transaction) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transaksi tidak ditemukan atau belum dibayar'
+                ], 404);
+            }
+
+            $transactionCode = $transaction->transaction_code;
+
+            foreach ($transaction->details as $detail) {
+
+                // 1️⃣ Kembalikan stok
+                $stock = Stocklevel::where('product_id', $detail->product_id)->first();
+
+                if ($stock) {
+                    $stock->quantity += $detail->quantity;
+                    $stock->save();
+
+                    // 2️⃣ Catat stock movement IN
+                    Stockmovement::create([
+                        'product_id' => $detail->product_id,
+                        'change_amount' => $detail->quantity,
+                        'movement_type' => 'in',
+                        'description' => 'Pembatalan transaksi ' . $transactionCode,
+                        'ref_nota' => $transactionCode,
+                    ]);
+                }
+            }
+
+            // 3️⃣ Kembalikan voucher
+            if ($transaction->voucher) {
+                $voucher = Voucher::find($transaction->voucher);
+
+                if ($voucher && $voucher->uses > 0) {
+                    $voucher->uses -= 1;
+                    $voucher->save();
+                }
+            }
+
+            // 4️⃣ Ubah status jadi VOID
+            $transaction->status = 'VOID';
+            $transaction->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil dibatalkan'
+            ]);
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
 

@@ -45,8 +45,8 @@
                             <input type="password" class="form-control" id="password_confirmation"
                                 name="password_confirmation" {{ !isset($user) ? 'required' : '' }}>
                         </div>
-
-                        <div class="mb-3">
+                        
+                        <div class="mb-3 {{ auth()->user()->hasRole('admin') ? '' : 'd-none' }}" id="current-roles">
                             <label for="roles" class="form-label">Roles</label>
                             <div id="roles" class="form-check">
                                 @foreach ($roles as $role)

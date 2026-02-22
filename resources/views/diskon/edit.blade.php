@@ -85,6 +85,9 @@
                                     <option value="false" {{ old('status', $diskon->is_Active) == 'false' ? 'selected' : '' }}>
                                         Tidak Aktif</option>
                                 </select>
+                                <small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
                             </div>
                         </div>
 

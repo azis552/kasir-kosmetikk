@@ -25,6 +25,7 @@
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control" autofocus id="name" name="name"
                                 value="{{ old('name', $user->name ?? '') }}" required>
+                            <small></small>
                         </div>
 
 

@@ -25,58 +25,69 @@
                     <a href="{{ route('products.index') }}" class="btn btn-primary mb-3">Kembali</a>
 
                     <form action="{{ route('products.updateStock', $product->id) }}" method="POST"
-                        class="shadow p-4 rounded-lg bg-white">
+                        class="card shadow-sm border-0 p-4 mb-4">
                         @csrf
                         @method('PUT')
-                        <h4 class="mb-4">Update Stok Produk</h4>
 
-                        <div class="row mb-3">
+                        <h4 class="mb-4 fw-semibold">Update Stok Produk</h4>
+
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Nama Produk</label>
-                                <input type="text" disabled class="form-control" name="name" value="{{ $product->name }}"
-                                    id="name" required>
+                                <label class="form-label">Nama Produk</label>
+                                <input type="text" class="form-control" value="{{ $product->name }}" disabled>
                             </div>
+
                             <div class="col-md-6">
-                                <label for="price" class="form-label">Stok Saat Ini</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $product->stocklevel->quantity ?? 0 }}"
-                                    placeholder="{{ $product->stocklevel->quantity ?? 0 }}"
-                                    name="stock" id="stock" disabled>
+                                <label class="form-label">Stok Saat Ini</label>
+                                <input type="text" class="form-control" value="{{ $product->stocklevel->quantity ?? 0 }}"
+                                    disabled>
                             </div>
                         </div>
-                        <div class="row mb-3">
+
+                        <div class="row g-3 mb-2">
                             <div class="col-md-6">
-                                <label for="change_amount"> Jumlah Produk </label>
-                                <input type="number" autofocus class="form-control" name="change_amount" id="change_amount">
+                                <label class="form-label">Jumlah Produk</label>
+                                <input type="number" autofocus class="form-control" name="change_amount" required>
+                                <small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
                             </div>
+
                             <div class="col-md-6">
-                                <label for="movement_type"> Tipe </label>
-                                <select class="form-control" name="movement_type" id="movement_type" required>
+                                <label class="form-label">Tipe Pergerakan</label>
+                                <select class="form-select" name="movement_type" required>
                                     <option value="in" selected>Masuk</option>
                                     <option value="out">Keluar</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label for="supplier" class="form-label">Supplier</label> <span>(optional)</span>
-                                <input type="text" class="form-control" name="supplier" id="supplier">
+                                <label class="form-label">
+                                    Supplier <span class="text-muted small">(optional)</span>
+                                </label>
+                                <input type="text" class="form-control" name="supplier">
                             </div>
+
                             <div class="col-md-6">
-                                <label for="ref_nota" class="form-label">Ref Nota</label><span>(optional)</span>
-                                <input type="text" class="form-control" name="ref_nota" id="ref_nota">
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <label for="description" class="form-label">Deskripsi</label><span>(optional)</span>
-                                <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+                                <label class="form-label">
+                                    Ref Nota <span class="text-muted small">(optional)</span>
+                                </label>
+                                <input type="text" class="form-control" name="ref_nota">
                             </div>
                         </div>
 
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-lg w-100 mt-3">Simpan</button>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Deskripsi <span class="text-muted small">(optional)</span>
+                            </label>
+                            <input type="text" class="form-control" name="description">
                         </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2">
+                            Simpan Perubahan
+                        </button>
                     </form>
                     <div class="card">
                         <div class="card-header">
@@ -84,41 +95,41 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-<table class="table table-striped">
-                        <thead> 
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Jumlah Perubahan</th>
-                                <th>Tipe Pergerakan</th>
-                                <th>Deskripsi</th>
-                                <th>Supplier</th>
-                                <th>Ref Nota</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($stockMovements as $movement)
-                                <tr>
-                                    <td>{{ $movement->created_at->format('d-m-Y H:i') }}</td>
-                                    <td>{{ $movement->change_amount }}</td>
-                                    <td>{{ $movement->movement_type == "in" ? "Masuk" : "Keluar" }}</td>
-                                    <td>{{ $movement->description }}</td>
-                                    <td>{{ $movement->supplier }}</td>
-                                    <td>{{ $movement->ref_nota }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-</div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-center">
-                                {{ $stockMovements->appends(request()->all())->links('pagination::bootstrap-5') }}
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Jumlah Perubahan</th>
+                                            <th>Tipe Pergerakan</th>
+                                            <th>Deskripsi</th>
+                                            <th>Supplier</th>
+                                            <th>Ref Nota</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($stockMovements as $movement)
+                                            <tr>
+                                                <td>{{ $movement->created_at->format('d-m-Y H:i') }}</td>
+                                                <td>{{ $movement->change_amount }}</td>
+                                                <td>{{ $movement->movement_type == "in" ? "Masuk" : "Keluar" }}</td>
+                                                <td>{{ $movement->description }}</td>
+                                                <td>{{ $movement->supplier }}</td>
+                                                <td>{{ $movement->ref_nota }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-center">
+                                        {{ $stockMovements->appends(request()->all())->links('pagination::bootstrap-5') }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                        </div>
-                    </div>
-                    
+
 
                 </div>
             </div>
@@ -130,7 +141,7 @@
 @section('script')
     <!-- Tambahkan Script untuk Masking -->
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Apply Inputmask for the price field with prefix 'Rp' and thousands separator
             Inputmask({
                 alias: "numeric",
@@ -141,7 +152,7 @@
                 placeholder: "0"
             }).mask('#price');
 
-            
+
         });
     </script>
 @endsection

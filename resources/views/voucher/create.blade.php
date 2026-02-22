@@ -61,8 +61,11 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="description" class="form-label">Deskripsi</label>
-                                <textarea class="form-control" name="description" id="description" rows="3">{{ old('description') }}</textarea>
+                                <input class="form-control" name="description" id="description" value="{{ old('description') }}" >
                             </div>
+                            <small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
                         </div>
                         <div class="text-center">
                             <button type="submit" class="btn btn-success btn-lg w-100 mt-3">Simpan</button>

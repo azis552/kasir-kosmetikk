@@ -46,7 +46,7 @@
                         <div class="dropdown-body">
                             <div class="profile-notification-scroll position-relative"
                                 style="max-height: calc(100vh - 225px)">
-                                <a href="{{ route('users.edit', auth()->user()->id) }}" class="dropdown-item">
+                                <a href="{{ route('users.edit', auth()->user()->id) }}" class="dropdown-item {{ auth()->user()->hasRole('admin') ? '' : 'd-none' }}">
                                     <span>
                                         <i class="ph ph-user align-middle me-2"></i>
                                         <span>Profil</span>

@@ -44,6 +44,7 @@
                                 <th>Deskripsi</th>
                                 <th>Jumlah Diskon</th>
                                 <th>Periode Voucher</th>
+                                <th>Digunakan</th>
                                 <th>Status</th>
                                 <th>Maks Penggunaan</th>
                                 <th>Actions</th>
@@ -56,6 +57,7 @@
                                     <td>{{ $voucher->description }}</td>
                                     <td>{{ App\Helpers\FormatHelper::formatRupiah($voucher->discount_amount) }}</td>
                                     <td>{{ $voucher->start_date }} - {{ $voucher->end_date }}</td>
+                                    <td>{{ $voucher->uses }}</td>
                                     <td>{{ $voucher->is_active ? 'Aktif' : 'Tidak Aktif' }}</td>
                                     <td>{{ $voucher->max_uses }}</td>
                                     

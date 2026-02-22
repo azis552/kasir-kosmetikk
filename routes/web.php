@@ -38,14 +38,18 @@ Route::middleware(['auth', 'log.user.activity'])->group(function () {
     Route::resource('kasir', KasirController::class);
     Route::middleware(['role:kasir'])->group(function () {
         Route::get('/dashboard/kasir', [DashboardController::class, 'kasir'])->name('dashboard.kasir');
+         Route::get('/users', [UserController::class, 'index'])->name('users.index');
     });
+
+    
 
 });
 Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function () {
     
+    
     Route::resource('products', ProductController::class);
     // Menampilkan daftar pengguna
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+   
     // Form untuk membuat pengguna baru
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     // Menyimpan pengguna baru
@@ -85,6 +89,7 @@ Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function (
 
     Route::get('/admin/theme', [ThemeController::class, 'index'])->name('admin.theme');
     Route::post('/admin/theme', [ThemeController::class, 'update'])->name('admin.theme.update');
+    Route::post('/kasir/batal-paid', [KasirController::class, 'batalTransaksiSudahBayar'])->name('kasir.batal.paid');
 
 
 

@@ -84,7 +84,9 @@
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div><small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
                         </div>
 
                         <div class="text-center">

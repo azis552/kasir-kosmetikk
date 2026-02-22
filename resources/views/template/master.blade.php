@@ -1,7 +1,23 @@
 @include('template.sidebar')
 
 @include('template.header')
-
+<!-- FLOATING INFO BUTTON -->
+<button id="btnShortcutInfo"
+        style="
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            background:#0d6efd;
+            color:white;
+            border:none;
+            font-size:20px;
+            z-index:9999;
+        ">
+    ?
+</button>
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">

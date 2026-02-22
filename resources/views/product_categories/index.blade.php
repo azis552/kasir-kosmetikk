@@ -16,15 +16,49 @@
                     @if(session('error'))
                         <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
-                    <!-- Tombol untuk menambah kategori baru -->
-                    <a href="{{ route('product_categories.create') }}" class="btn btn-primary mb-3">Add New Category</a>
+                   <div class="row mb-4">
 
-                    <!-- Form Pencarian -->
-                    <form action="{{ route('product_categories.index') }}" method="GET" class="d-flex form-inline mb-3">
-                        <input autofocus type="text" name="search" class="form-control" placeholder="Search by Category Name..."
-                            value="{{ request()->search }}">
-                        <button type="submit" class="btn btn-primary ml-2">Search</button>
-                    </form>
+    {{-- Form Tambah Kategori --}}
+    <div class="col-md-6 mb-3 mb-md-0">
+        <form action="{{ route('product_categories.store') }}" method="POST" class="d-flex gap-2">
+            @csrf
+            <input 
+                type="text" 
+                class="form-control" 
+                name="name" 
+                placeholder="Masukkan kategori baru..."
+                required
+            >
+            <button type="submit" class="btn btn-success">
+                + Save
+            </button>
+            
+        </form>
+        <small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
+    </div>
+
+    {{-- Form Search --}}
+    <div class="col-md-6">
+        <form action="{{ route('product_categories.index') }}" method="GET" class="d-flex gap-2">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control"
+                placeholder="Search category..."
+                value="{{ request()->search }}"
+            >
+            <button type="submit" class="btn btn-primary">
+                🔍 Search
+            </button>
+        </form><small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk mencari.
+                                </small>
+    </div>
+
+</div>
+                   
 
                     <!-- Tabel untuk menampilkan kategori produk -->
                     <div class="table-responsive">

@@ -54,12 +54,20 @@
                                         <td>{{ $transaction->user->name }}</td>
                                         <td>{{ $transaction->terminal_id }}</td>
                                         <td>
+                                            @if($transaction->status == 'VOID')
+                                            <span class="btn btn-danger">Dibatalkan </span>
+                                            @else
                                             <a href="{{ route('transaksis.show', $transaction->id) }}"
                                                 class="btn btn-primary">Detail</a>
+                                            <button type="button" data-transaksi="{{ $transaction->id }}"
+                                                class="btn btn-danger batal-paid">
+                                                Batak Transaksi
+                                            </button>
                                             <button id="cetak" type="button" data-transaksi="{{ $transaction->id }}"
                                                 class="btn btn-warning ">
                                                 Cetak
                                             </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -99,29 +107,29 @@
                 const doc = iframe.contentWindow.document;
                 doc.open();
                 doc.write(`
-                <html>
-                <head>
-                    <title>Cetak Struk</title>
-                    <style>
-                        @page {
-                            size: 58mm auto;
-                            margin: 0;
-                        }
-                        body {
-                            width: 58mm;
-                            font-family: monospace;
-                            font-size: 11px;
-                            white-space: pre;
-                            margin: 0;
-                            padding: 4px;
-                        }
-                    </style>
-                </head>
-                <body>
-        ${receiptContent}
-                </body>
-                </html>
-            `);
+                    <html>
+                    <head>
+                        <title>Cetak Struk</title>
+                        <style>
+                            @page {
+                                size: 58mm auto;
+                                margin: 0;
+                            }
+                            body {
+                                width: 58mm;
+                                font-family: monospace;
+                                font-size: 11px;
+                                white-space: pre;
+                                margin: 0;
+                                padding: 4px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+            ${receiptContent}
+                    </body>
+                    </html>
+                `);
                 doc.close();
 
                 iframe.onload = function () {
@@ -135,6 +143,60 @@
             $(document).on('click', '#cetak', function () {
                 const transactionId = $(this).data('transaksi');
                 window.open(`/kasir/cetak/${transactionId}`, '_blank');
+            });
+
+            $(document).on('click', '.batal-paid', function () {
+
+                let transactionId = $(this).data('transaksi');
+
+                Swal.fire({
+                    title: 'Batalkan transaksi?',
+                    text: 'Transaksi yang sudah dibayar akan di-VOID dan stok akan kembali.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Batalkan',
+                    cancelButtonText: 'Tidak'
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        $.ajax({
+                            url: "{{ route('kasir.batal.paid') }}",
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                transactionId: transactionId
+                            },
+                            success: function (response) {
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+
+                            },
+                            error: function (xhr) {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: xhr.responseJSON?.message || 'Terjadi kesalahan'
+                                });
+
+                            }
+                        });
+
+                    }
+
+                });
+
             });
 
 

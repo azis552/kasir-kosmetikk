@@ -100,6 +100,9 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
                         </div>
 
                         <div class="text-center">
