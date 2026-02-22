@@ -164,13 +164,7 @@
 
                                 <div class="alert alert-info py-2 px-3 mt-3 small d-flex align-items-center">
                                     <i class="fa fa-keyboard me-2"></i>
-                                    <div>
-                                        <strong>Shortcut:</strong>
-                                        Alt+N (Tambah Baru) •
-                                        Alt+B (Bayar) •
-                                        Alt+M (Metode Pembayaran) •
-                                        F9 (Finish) •
-                                    </div>
+                                    
                                 </div>
                             </div>
 

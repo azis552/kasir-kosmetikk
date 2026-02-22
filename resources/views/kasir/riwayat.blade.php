@@ -61,7 +61,7 @@
                                                 class="btn btn-primary">Detail</a>
                                             <button type="button" data-transaksi="{{ $transaction->id }}"
                                                 class="btn btn-danger batal-paid">
-                                                Batak Transaksi
+                                                Batal Transaksi
                                             </button>
                                             <button id="cetak" type="button" data-transaksi="{{ $transaction->id }}"
                                                 class="btn btn-warning ">

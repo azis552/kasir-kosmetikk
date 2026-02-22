@@ -64,6 +64,9 @@
 </script>
 
 <script>
+    $(document).on('click', '#btnReload', function () {
+        location.reload();
+    });
     $(document).on('click', '#btnDashboard', function () {
 
         let transactionId = $('#batal').data('transaksi');
@@ -137,11 +140,7 @@ $(document).on('keydown', function (e) {
     // ===============================
     if (e.altKey && key === 'd') {
         e.preventDefault();
-        if (isAdmin) {
-            window.location.href = "{{ route('dashboard.admin') }}";
-        } else if (isKasir) {
-            window.location.href = "{{ route('dashboard.kasir') }}";
-        }
+        $('#btnDashboard').click();
     }
 
     // ===============================
@@ -260,7 +259,7 @@ $(document).on('keydown', function (e) {
             window.location.href = "{{ route('settings.toko') }}";
         }
 
-        if (e.altKey && key === 'm') {
+        if (e.altKey && key === 'a') {
             e.preventDefault();
             window.location.href = "{{ route('admin.theme') }}";
         }
