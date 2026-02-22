@@ -570,9 +570,17 @@ class KasirController extends Controller
     public function show($id)
     {
 
-        $transaction = Transaction::find($id);
-        $title = "Detail Transaksi";
-        return view('kasir.detail_transaksi', compact('transaction', 'title'));
+       $transaction = Transaction::find($id);
+        if (!$transaction) {
+            abort(404, 'Transaksi tidak ditemukan');
+        }
+
+        $details = TransactionDetail::where('transaction_id', $transaction->id)
+            ->with(['product', 'stock_product', 'diskons'])
+            ->get();
+$title = "Riwayat Transaksi";
+      
+        return view('kasir.detail_transaksi', compact('transaction', 'details', 'title'));
     }
 
     public function batalTransaksiSudahBayar(Request $request)
