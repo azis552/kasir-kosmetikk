@@ -64,8 +64,15 @@ margin-right: 2mm;
 	    margin-left : 5mm;
             font-weight: bold;
         }
+
+        @media print {
+    .no-print {
+        display: none !important;
+    }
+}
     </style>
 </head>
+<button class="no-print" onclick="window.print()">Print</button>
 
 <body onload="window.print()">
 
@@ -144,6 +151,12 @@ margin-right: 2mm;
         <td class="item-name" style="padding:0;">Diskon</td>
         <td style="padding-right:2mm; text-align:right;">
             {{ number_format($transaction->diskon_item,0,',','.') }}
+        </td>
+    </tr>
+    <tr>
+        <td class="item-name" style="padding:0;">Voucher</td>
+        <td style="padding-right:2mm; text-align:right;">
+            {{ number_format($transaction->potongan_voucher,0,',','.') }}
         </td>
     </tr>
     <tr style="font-weight:bold;">

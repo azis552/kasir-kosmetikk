@@ -416,42 +416,42 @@
                         $('#voucherInfo').html(
 
                             `<div class="d-flex align-items-center gap-2">
-                                                                                                                            <button id="btnRemoveVoucher" 
-                                                                                                                            data-id="${response.vouchers.id}" 
-                                                                                                                            data-transaksi="${response.transactionId}"
-                                                                                                                            class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
-                                                                                                                        </div>`
+                                                                                                                                <button id="btnRemoveVoucher" 
+                                                                                                                                data-id="${response.vouchers.id}" 
+                                                                                                                                data-transaksi="${response.transactionId}"
+                                                                                                                                class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
+                                                                                                                            </div>`
                         )
                     }
 
 
                     response.items.forEach(function (item) {
                         let row = `<tr>
-                                                                                                                                <td>
-                                                                                                                                    <div class="d-flex align-items-center gap-2">
-                                                                                                                                        <div>
-                                                                                                                                            <div class="fw-semibold">${item.product_name}</div>
-                                                                                                                                            <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
+                                                                                                                                    <td>
+                                                                                                                                        <div class="d-flex align-items-center gap-2">
+                                                                                                                                            <div>
+                                                                                                                                                <div class="fw-semibold">${item.product_name}</div>
+                                                                                                                                                <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
+                                                                                                                                            </div>
                                                                                                                                         </div>
-                                                                                                                                    </div>
-                                                                                                                                </td>
-                                                                                                                                <td class="text-end money" data-price="${item.price}">${item.price}</td>
-                                                                                                                                <td class="text-center">
-                                                                                                                                    <div class="d-inline-flex align-items-center gap-1">
-                                                                                                                                        <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
-                                                                                                                                        <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" style="width:60px;">
-                                                                                                                                        <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
+                                                                                                                                    </td>
+                                                                                                                                    <td class="text-end money" data-price="${item.price}">${item.price}</td>
+                                                                                                                                    <td class="text-center">
+                                                                                                                                        <div class="d-inline-flex align-items-center gap-1">
+                                                                                                                                            <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
+                                                                                                                                            <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" style="width:60px;">
+                                                                                                                                            <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
 
 
-                                                                                                                                    </div>
-                                                                                                                                </td>
-                                                                                                                                <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
+                                                                                                                                        </div>
+                                                                                                                                    </td>
+                                                                                                                                    <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
 
 
-                                                                                                                                <td class="text-center" style="min-width:100px;">
-                                                                                                                                    <div class="discount-box"
-                                                                                                                                        data-transaksi="${item.transaction_id}"
-                                                                                                                                        data-product="${item.product_id}">`;
+                                                                                                                                    <td class="text-center" style="min-width:100px;">
+                                                                                                                                        <div class="discount-box"
+                                                                                                                                            data-transaksi="${item.transaction_id}"
+                                                                                                                                            data-product="${item.product_id}">`;
 
                         const applied = Array.isArray(item.applied_discount_ids) ? item
                             .applied_discount_ids : [];
@@ -467,39 +467,39 @@
 
 
                             row += `
-                                                                                                        <div class="form-check text-start d-flex align-items-center gap-2">
-                                                                                                            <input
-                                                                                                                class="form-check-input discount-check"
-                                                                                                                type="radio"  
-                                                                                                                data-nominal="${totalNominalDiskon}"
-                                                                                                                name="discount-${item.product_id}" 
-                                                                                                                value="${disc.id}"
-                                                                                                                ${checked ? 'checked' : ''}
-                                                                                                                ${disabled ? 'disabled' : ''}
-                                                                                                            >
-                                                                                                            <label class="form-check-label d-flex flex-column gap-1">
-                                                                                                                <div class="d-flex align-items-center gap-2">
-                                                                                                                    <span>${disc.percentage}%</span>
-                                                                                                                    <span class="badge bg-success">Min ${disc.min_qty}</span>
-                                                                                                                </div>
-                                                                                                                <small class="text-muted diskon-item">
-                                                                                                                    -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
-                                                                                                                </small>
-                                                                                                            </label>
-                                                                                                        </div>
-                                                                                                    `;
+                                                                                                            <div class="form-check text-start d-flex align-items-center gap-2">
+                                                                                                                <input
+                                                                                                                    class="form-check-input discount-check"
+                                                                                                                    type="radio"  
+                                                                                                                    data-nominal="${totalNominalDiskon}"
+                                                                                                                    name="discount-${item.product_id}" 
+                                                                                                                    value="${disc.id}"
+                                                                                                                    ${checked ? 'checked' : ''}
+                                                                                                                    ${disabled ? 'disabled' : ''}
+                                                                                                                >
+                                                                                                                <label class="form-check-label d-flex flex-column gap-1">
+                                                                                                                    <div class="d-flex align-items-center gap-2">
+                                                                                                                        <span>${disc.percentage}%</span>
+                                                                                                                        <span class="badge bg-success">Min ${disc.min_qty}</span>
+                                                                                                                    </div>
+                                                                                                                    <small class="text-muted diskon-item">
+                                                                                                                        -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
+                                                                                                                    </small>
+                                                                                                                </label>
+                                                                                                            </div>
+                                                                                                        `;
                             totalNominalDiskon = 0;
                         });
 
 
                         row += `</div>
-                                                                                                                                </td>
+                                                                                                                                    </td>
 
-                                                                                                                                <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
-                                                                                                                                <td class="text-center">
-                                                                                                                                    <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
-                                                                                                                                </td>
-                                                                                                                            </tr>`;
+                                                                                                                                    <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
+                                                                                                                                    <td class="text-center">
+                                                                                                                                        <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
+                                                                                                                                    </td>
+                                                                                                                                </tr>`;
 
                         cartBody.append(row);
 
@@ -516,113 +516,81 @@
                         $(this).text(formattedValue);
                     });
 
-                    let grandTotal = 0;
-                    let grandTotalDiskon = 0;
+                    // ===============================
+// HITUNG TOTAL FINAL SUPER AMAN
+// ===============================
 
-                    $('.sub-totalori').each(function () {
-                        const raw = $(this).text()
-                            .replace(/[^\d]/g, ''); // ambil angka saja
+let subtotal = 0;
+let diskonItem = 0;
 
-                        const value = Number(raw) || 0;
-                        grandTotal += value;
-                    });
+// 1️⃣ Hitung subtotal
+$('.sub-totalori').each(function () {
+    subtotal += Number($(this).text().replace(/[^\d]/g, '')) || 0;
+});
 
-                    $('#subTotal').text(
-                        new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR',
-                            minimumFractionDigits: 0
-                        }).format(grandTotal)
-                    );
+// 2️⃣ Hitung diskon item
+$('.discount-check:checked').each(function () {
+    diskonItem += Math.round(Number($(this).data('nominal')) || 0);
+});
 
-                    $('.discount-check:checked').each(function () {
-                        let raw = $(this).data('nominal'); // Ganti const dengan let
-                        raw = Math.round(raw); // Ubah nilai raw
+// 3️⃣ Voucher
+let voucher = Number(response.vouchers.discount_amount) || 0;
 
-                        const value = Number(raw) || 0; // Pastikan raw menjadi angka
-                        grandTotalDiskon -= value; // Kurangi grandTotalDiskon dengan nilai diskon
+// 4️⃣ Total diskon gabungan
+let totalDiskon = diskonItem + voucher;
 
-                    });
+// 🚫 Batasi diskon maksimal = subtotal
+totalDiskon = Math.min(totalDiskon, subtotal);
 
-                    $('#discItem').text(
-                        new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR',
-                            minimumFractionDigits: 0
-                        }).format(grandTotalDiskon)
-                    );
-                    let vouchers = 0;
-                    let totalakhir = 0;
-                    if (response.vouchers.discount_amount > 0) {
-                        vouchers = response.vouchers.discount_amount;
-                        totalakhir = grandTotal - (-grandTotalDiskon + vouchers);
-                    } else {
-                        vouchers = 0;
-                    }
+// 5️⃣ Total setelah diskon
+let totalSetelahDiskon = subtotal - totalDiskon;
 
-                    $('#grandTotal').text(
-                        new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR',
-                            minimumFractionDigits: 0
-                        }).format(grandTotal - (-grandTotalDiskon + vouchers))
-                    );
+// ===============================
+// PAJAK (HANYA JIKA TOTAL > 0)
+// ===============================
 
-                    let TotalAkhir = 0;
-                    let RatePajak = 0;
+let pajak = 0;
+let totalAkhir = totalSetelahDiskon;
 
-                    if ({{ App\Helpers\FormatHelper::taxCount() }} > 0) {
-                        RatePajak = {{ App\Helpers\FormatHelper::tax() }};
-                        TotalAkhir = grandTotal - (-grandTotalDiskon + vouchers);
-                        percenTax = RatePajak + ' %';
-                        $('#texttax').text('{{ App\Helpers\FormatHelper::taxName() }}' + ' (' + percenTax +
-                            ')');
-                        $('#tax').text(
-                            new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(parseInt(TotalAkhir * RatePajak / 100))
-                        )
-                        $('#grandTotalakhir').text(
-                            new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(TotalAkhir + (parseInt(TotalAkhir * RatePajak / 100)))
-                        );
-                    } else {
-                        TotalAkhir = grandTotal - (-grandTotalDiskon + vouchers);
-                        $('#grandTotalakhir').text(
-                            new Intl.NumberFormat('id-ID', {
-                                style: 'currency',
-                                currency: 'IDR',
-                                minimumFractionDigits: 0
-                            }).format(TotalAkhir)
-                        );
-                    }
+@if(App\Helpers\FormatHelper::taxCount() > 0)
+    if (totalSetelahDiskon > 0) {
+        let rate = {{ App\Helpers\FormatHelper::tax() }};
+        pajak = Math.floor(totalSetelahDiskon * rate / 100);
+        totalAkhir += pajak;
+    }
+@endif
 
+// ===============================
+// FORMAT RUPIAH
+// ===============================
 
-                    let paid = $('#paid').val();
+function rupiah(n) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+    }).format(n);
+}
 
-                    if (!paid) {
-                        paid = 0;
-                    }
+// ===============================
+// UPDATE UI
+// ===============================
 
-                    // ambil angka saja
-                    paid = parseInt(paid.toString().replace(/\D/g, '')) || 0;
+$('#subTotal').text(rupiah(subtotal));
+$('#discItem').text('- ' + rupiah(diskonItem));
+$('#voucherDiscount').text('- ' + rupiah(voucher));
+$('#grandTotal').text(rupiah(totalSetelahDiskon));
+$('#tax').text(rupiah(pajak));
+$('#grandTotalakhir').text(rupiah(totalAkhir));
 
-                    // hitung kembalian
-                    let kembalian = paid - TotalAkhir;
+// ===============================
+// KEMBALIAN
+// ===============================
 
-                    // tampilkan
-                    $('#kembalian').text(
-                        new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR',
-                            minimumFractionDigits: 0
-                        }).format(kembalian > 0 ? kembalian : 0)
-                    );
+let paid = Number($('#paid').val().replace(/[^\d]/g, '')) || 0;
+let kembalian = paid - totalAkhir;
+
+$('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
 
                 } catch (error) {
                     console.error('Error fetching cart:', error);
@@ -978,29 +946,29 @@
                 const doc = iframe.contentWindow.document;
                 doc.open();
                 doc.write(`
-                                                                    <html>
-                                                                    <head>
-                                                                        <title>Cetak Struk</title>
-                                                                        <style>
-                                                                            @page {
-                                                                                size: 58mm auto;
-                                                                                margin: 0;
-                                                                            }
-                                                                            body {
-                                                                                width: 58mm;
-                                                                                font-family: monospace;
-                                                                                font-size: 11px;
-                                                                                white-space: pre;
-                                                                                margin: 0;
-                                                                                padding: 4px;
-                                                                            }
-                                                                        </style>
-                                                                    </head>
-                                                                    <body>
-                                                            ${receiptContent}
-                                                                    </body>
-                                                                    </html>
-                                                                `);
+                                                                        <html>
+                                                                        <head>
+                                                                            <title>Cetak Struk</title>
+                                                                            <style>
+                                                                                @page {
+                                                                                    size: 58mm auto;
+                                                                                    margin: 0;
+                                                                                }
+                                                                                body {
+                                                                                    width: 58mm;
+                                                                                    font-family: monospace;
+                                                                                    font-size: 11px;
+                                                                                    white-space: pre;
+                                                                                    margin: 0;
+                                                                                    padding: 4px;
+                                                                                }
+                                                                            </style>
+                                                                        </head>
+                                                                        <body>
+                                                                ${receiptContent}
+                                                                        </body>
+                                                                        </html>
+                                                                    `);
                 doc.close();
 
                 iframe.onload = function () {
