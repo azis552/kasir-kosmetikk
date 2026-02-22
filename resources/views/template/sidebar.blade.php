@@ -262,7 +262,7 @@
             <li><b>F9</b> → Proses Bayar</li>
         </ul>
 
-        <h6 style="color:#000;">Admin</h6>
+        <h6 style="color:#000;">Berpindah menu khusus admin</h6>
         <ul style="color:#000;">
             <li><b>ALT + U</b> → Users</li>
             <li><b>ALT + O</b> → Roles</li>
