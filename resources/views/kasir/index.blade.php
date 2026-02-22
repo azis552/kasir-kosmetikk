@@ -121,7 +121,7 @@
                                 </div>
 
                                 <div class="d-flex gap-2">
-                                    
+
 
                                     <button class="btn btn-outline-danger" id="batal" type="button">
                                         Batal Transaksi
@@ -162,8 +162,15 @@
                                         placeholder="Nama pelanggan (opsional)">
                                 </div>
 
-                                <div class="small text-muted">
-                                    Tips: klik input di atas, lalu scan barcode. Enter akan menambahkan item.
+                                <div class="alert alert-info py-2 px-3 mt-3 small d-flex align-items-center">
+                                    <i class="fa fa-keyboard me-2"></i>
+                                    <div>
+                                        <strong>Shortcut:</strong>
+                                        Alt+N (Tambah Baru) •
+                                        Alt+B (Bayar) •
+                                        Alt+M (Metode Pembayaran) •
+                                        F9 (Finish) •
+                                    </div>
                                 </div>
                             </div>
 
@@ -409,42 +416,42 @@
                         $('#voucherInfo').html(
 
                             `<div class="d-flex align-items-center gap-2">
-                                                                                                        <button id="btnRemoveVoucher" 
-                                                                                                        data-id="${response.vouchers.id}" 
-                                                                                                        data-transaksi="${response.transactionId}"
-                                                                                                        class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
-                                                                                                    </div>`
+                                                                                                                            <button id="btnRemoveVoucher" 
+                                                                                                                            data-id="${response.vouchers.id}" 
+                                                                                                                            data-transaksi="${response.transactionId}"
+                                                                                                                            class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
+                                                                                                                        </div>`
                         )
                     }
 
 
                     response.items.forEach(function (item) {
                         let row = `<tr>
-                                                                                                            <td>
-                                                                                                                <div class="d-flex align-items-center gap-2">
-                                                                                                                    <div>
-                                                                                                                        <div class="fw-semibold">${item.product_name}</div>
-                                                                                                                        <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </td>
-                                                                                                            <td class="text-end money" data-price="${item.price}">${item.price}</td>
-                                                                                                            <td class="text-center">
-                                                                                                                <div class="d-inline-flex align-items-center gap-1">
-                                                                                                                    <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
-                                                                                                                    <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" style="width:60px;">
-                                                                                                                    <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
+                                                                                                                                <td>
+                                                                                                                                    <div class="d-flex align-items-center gap-2">
+                                                                                                                                        <div>
+                                                                                                                                            <div class="fw-semibold">${item.product_name}</div>
+                                                                                                                                            <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </td>
+                                                                                                                                <td class="text-end money" data-price="${item.price}">${item.price}</td>
+                                                                                                                                <td class="text-center">
+                                                                                                                                    <div class="d-inline-flex align-items-center gap-1">
+                                                                                                                                        <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
+                                                                                                                                        <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" style="width:60px;">
+                                                                                                                                        <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
 
 
-                                                                                                                </div>
-                                                                                                            </td>
-                                                                                                            <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
+                                                                                                                                    </div>
+                                                                                                                                </td>
+                                                                                                                                <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
 
 
-                                                                                                            <td class="text-center" style="min-width:100px;">
-                                                                                                                <div class="discount-box"
-                                                                                                                    data-transaksi="${item.transaction_id}"
-                                                                                                                    data-product="${item.product_id}">`;
+                                                                                                                                <td class="text-center" style="min-width:100px;">
+                                                                                                                                    <div class="discount-box"
+                                                                                                                                        data-transaksi="${item.transaction_id}"
+                                                                                                                                        data-product="${item.product_id}">`;
 
                         const applied = Array.isArray(item.applied_discount_ids) ? item
                             .applied_discount_ids : [];
@@ -460,39 +467,39 @@
 
 
                             row += `
-                                                                                    <div class="form-check text-start d-flex align-items-center gap-2">
-                                                                                        <input
-                                                                                            class="form-check-input discount-check"
-                                                                                            type="radio"  
-                                                                                            data-nominal="${totalNominalDiskon}"
-                                                                                            name="discount-${item.product_id}" 
-                                                                                            value="${disc.id}"
-                                                                                            ${checked ? 'checked' : ''}
-                                                                                            ${disabled ? 'disabled' : ''}
-                                                                                        >
-                                                                                        <label class="form-check-label d-flex flex-column gap-1">
-                                                                                            <div class="d-flex align-items-center gap-2">
-                                                                                                <span>${disc.percentage}%</span>
-                                                                                                <span class="badge bg-success">Min ${disc.min_qty}</span>
-                                                                                            </div>
-                                                                                            <small class="text-muted diskon-item">
-                                                                                                -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
-                                                                                            </small>
-                                                                                        </label>
-                                                                                    </div>
-                                                                                `;
+                                                                                                        <div class="form-check text-start d-flex align-items-center gap-2">
+                                                                                                            <input
+                                                                                                                class="form-check-input discount-check"
+                                                                                                                type="radio"  
+                                                                                                                data-nominal="${totalNominalDiskon}"
+                                                                                                                name="discount-${item.product_id}" 
+                                                                                                                value="${disc.id}"
+                                                                                                                ${checked ? 'checked' : ''}
+                                                                                                                ${disabled ? 'disabled' : ''}
+                                                                                                            >
+                                                                                                            <label class="form-check-label d-flex flex-column gap-1">
+                                                                                                                <div class="d-flex align-items-center gap-2">
+                                                                                                                    <span>${disc.percentage}%</span>
+                                                                                                                    <span class="badge bg-success">Min ${disc.min_qty}</span>
+                                                                                                                </div>
+                                                                                                                <small class="text-muted diskon-item">
+                                                                                                                    -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
+                                                                                                                </small>
+                                                                                                            </label>
+                                                                                                        </div>
+                                                                                                    `;
                             totalNominalDiskon = 0;
                         });
 
 
                         row += `</div>
-                                                                                                            </td>
+                                                                                                                                </td>
 
-                                                                                                            <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
-                                                                                                            <td class="text-center">
-                                                                                                                <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
-                                                                                                            </td>
-                                                                                                        </tr>`;
+                                                                                                                                <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
+                                                                                                                                <td class="text-center">
+                                                                                                                                    <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
+                                                                                                                                </td>
+                                                                                                                            </tr>`;
 
                         cartBody.append(row);
 
@@ -695,7 +702,14 @@
                         productId: productId
                     },
                     success: function (response) {
+                        swal.fire({
+                            icon: 'success',
+                            title: 'Produk dihapus',
+                            text: response.message || 'Produk berhasil dihapus dari keranjang.',
+                            timer: 1000,
+                        });
                         fetchCart();
+                        $('#barcodeInput').val('').focus();
                     },
                     error: function (xhr) {
                         swal.fire({
@@ -738,6 +752,43 @@
                         });
                     }
                 });
+            });
+            $(document).on('keydown', '.qty-input', function (e) {
+
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // supaya tidak submit form
+
+                    const input = $(this);
+                    const newQty = parseInt(input.val());
+
+                    const transactionId = $(this).data('transaksi');
+                    const productId = $(this).data('product');
+
+                    $.ajax({
+                        url: "{{ route('kasir.qtyProduk') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            transactionId: transactionId,
+                            productId: productId,
+                            qty: newQty // kirim qty langsung
+                        },
+                        success: function (response) {
+                            fetchCart();
+                            $('#barcodeInput').val('').focus();
+                        },
+                        error: function (xhr) {
+                            fetchCart();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal update qty',
+                                text: xhr.responseJSON?.message || 'Terjadi kesalahan',
+                                timer: 1000,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
+                }
             });
             $(document).on('click', '.qty-decrease', function () {
                 const input = $(this).closest('td').next().find('.qty-input');
@@ -869,23 +920,8 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            // Print the receipt
-                            printReceipt(response.receiptContent);
-                            $('#bayar').prop('disabled', true);
-                            $('#batal').prop('disabled', true);
-                            $('#btnTambah').prop('disabled', true);
-                            $('#btnApplyVoucher').prop('disabled', true);
-                            $('#btnRemoveVoucher').prop('disabled', true);
-                            $('#pelanggan').prop('disabled', true);
-                            $('#paymentMethod').prop('disabled', true);
-                            $('.qty-input').prop('disabled', true);
-                            $('.qty-increase').prop('disabled', true);
-                            $('.qty-decrease').prop('disabled', true);
-                            $('#discount-check').prop('disabled', true);
-                            $('#cetak').css('display', 'block');
-                            $('#transaksiBaru').css('display', 'block');
-                            $('#cetak').attr('data-transaksi', transactionId);
-                            $('#voucherCode').attr('disabled', true);
+                            window.open(`/kasir/cetak/${transactionId}`, '_blank');
+                            location.reload();
 
                         }
                     },
@@ -942,29 +978,29 @@
                 const doc = iframe.contentWindow.document;
                 doc.open();
                 doc.write(`
-                                                <html>
-                                                <head>
-                                                    <title>Cetak Struk</title>
-                                                    <style>
-                                                        @page {
-                                                            size: 58mm auto;
-                                                            margin: 0;
-                                                        }
-                                                        body {
-                                                            width: 58mm;
-                                                            font-family: monospace;
-                                                            font-size: 11px;
-                                                            white-space: pre;
-                                                            margin: 0;
-                                                            padding: 4px;
-                                                        }
-                                                    </style>
-                                                </head>
-                                                <body>
-                                        ${receiptContent}
-                                                </body>
-                                                </html>
-                                            `);
+                                                                    <html>
+                                                                    <head>
+                                                                        <title>Cetak Struk</title>
+                                                                        <style>
+                                                                            @page {
+                                                                                size: 58mm auto;
+                                                                                margin: 0;
+                                                                            }
+                                                                            body {
+                                                                                width: 58mm;
+                                                                                font-family: monospace;
+                                                                                font-size: 11px;
+                                                                                white-space: pre;
+                                                                                margin: 0;
+                                                                                padding: 4px;
+                                                                            }
+                                                                        </style>
+                                                                    </head>
+                                                                    <body>
+                                                            ${receiptContent}
+                                                                    </body>
+                                                                    </html>
+                                                                `);
                 doc.close();
 
                 iframe.onload = function () {
@@ -978,6 +1014,27 @@
             $(document).on('click', '#cetak', function () {
                 const transactionId = $(this).data('transaksi');
                 window.open(`/kasir/cetak/${transactionId}`, '_blank');
+            });
+            $(document).on('keydown', function (e) {
+                if (e.altKey && e.key.toLowerCase() === 'n') {
+                    e.preventDefault();
+                    $('#barcode').focus().select();
+                }
+                if (e.altKey && e.key.toLowerCase() === 'b') {
+                    e.preventDefault();
+                    $('#paid').focus().select();
+                }
+
+                if (e.altKey && e.key.toLowerCase() === 'm') {
+                    e.preventDefault();
+                    $('#paymentMethod').focus();
+                }
+
+                if (e.key === 'F9') {
+                    e.preventDefault();
+                    $('#bayar').click();
+                }
+
             });
         });
 

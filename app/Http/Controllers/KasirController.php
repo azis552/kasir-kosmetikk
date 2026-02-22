@@ -233,41 +233,93 @@ class KasirController extends Controller
 
     public function qty_produk(Request $request)
     {
-        $increase = $request->input('increase');
-        if ($increase == "true") {
-            $increase = true;
-        } else {
-            $increase = false;
-        }
-        $request->merge(['increase' => $increase]);
-
         $request->validate([
             'transactionId' => 'required|integer',
             'productId' => 'required|integer',
-            'increase' => 'required|boolean',
         ]);
+
         $detail = TransactionDetail::where('transaction_id', $request->transactionId)
             ->where('product_id', $request->productId)
             ->firstOrFail();
-        if ($request->increase) {
-            if ($detail->quantity + 1 > $detail->stock_product->quantity) {
-                return response()->json(['success' => false, 'error' => 'Stok produk tidak mencukupi'], 400);
+
+        /*
+        |--------------------------------------------------------------------------
+        | MODE 1: Update langsung dari input (Enter)
+        |--------------------------------------------------------------------------
+        */
+        if ($request->has('qty')) {
+
+            $newQty = (int) $request->qty;
+
+            if ($newQty < 1) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Quantity minimal 1'
+                ], 400);
             }
-            $detail->quantity += 1;
-        } else {
-            if ($detail->quantity > 1) {
-                $detail->quantity -= 1;
+
+            if ($newQty > $detail->stock_product->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Stok produk tidak mencukupi'
+                ], 400);
+            }
+
+            $detail->quantity = $newQty;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | MODE 2: Tombol + / -
+        |--------------------------------------------------------------------------
+        */ elseif ($request->has('increase')) {
+
+            $increase = filter_var($request->increase, FILTER_VALIDATE_BOOLEAN);
+
+            if ($increase) {
+
+                if ($detail->quantity + 1 > $detail->stock_product->quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Stok produk tidak mencukupi'
+                    ], 400);
+                }
+
+                $detail->quantity += 1;
+
             } else {
-                return response()->json(['success' => false, 'error' => 'quantity minimal 1'], 400);
+
+                if ($detail->quantity <= 1) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Quantity minimal 1'
+                    ], 400);
+                }
+
+                $detail->quantity -= 1;
             }
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hitung Ulang Line Total
+        |--------------------------------------------------------------------------
+        */
         if ($detail->discount != null) {
-            $diskon = DiskonProduk::findOrFail($detail->discount);
-            $diskon = $diskon->diskon_percentage;
-            $detail->line_total = ($detail->price - (($diskon / 100) * $detail->price)) * $detail->quantity;
+
+            $diskon = DiskonProduk::find($detail->discount);
+
+            if ($diskon) {
+                $percentage = $diskon->diskon_percentage;
+
+                $detail->line_total =
+                    ($detail->price - (($percentage / 100) * $detail->price))
+                    * $detail->quantity;
+            }
         } else {
             $detail->line_total = $detail->price * $detail->quantity;
         }
+
         $detail->save();
 
         return response()->json(['success' => true]);
@@ -411,82 +463,82 @@ class KasirController extends Controller
     }
 
     public function cetak($id)
-{
- 
+    {
 
-    $transaction = Transaction::find($id);
-    if (!$transaction) {
-        abort(404, 'Transaksi tidak ditemukan');
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            abort(404, 'Transaksi tidak ditemukan');
+        }
+
+        $details = TransactionDetail::where('transaction_id', $transaction->id)
+            ->with(['product', 'stock_product', 'diskons'])
+            ->get();
+
+        return view('kasir.receipt', compact('transaction', 'details'));
     }
-
-    $details = TransactionDetail::where('transaction_id', $transaction->id)
-        ->with(['product', 'stock_product', 'diskons'])
-        ->get();
-
-    return view('kasir.receipt', compact('transaction', 'details'));
-}
 
 
     // Method to generate the receipt content (plain text or ESC/POS format)
-  private function generatePosReceipt($transaction, $details)
-{
-    $line = str_repeat('-', 32) . "\n";
+    private function generatePosReceipt($transaction, $details)
+    {
+        $line = str_repeat('-', 32) . "\n";
 
-    $receipt = '';
-    $receipt .= str_pad('STRUK PEMBELIAN', 32, ' ', STR_PAD_BOTH) . "\n";
-    $receipt .= $line;
+        $receipt = '';
+        $receipt .= str_pad('STRUK PEMBELIAN', 32, ' ', STR_PAD_BOTH) . "\n";
+        $receipt .= $line;
 
-    // HEADER (DIPAKSA LURUS)
-    $receipt .= str_pad('No. Transaksi', 16) . ": " . substr($transaction->transaction_code, 0, 14) . "\n";
-    $receipt .= str_pad('Pelanggan', 16) . ": " . substr($transaction->pelanggan_name ?: '-', 0, 14) . "\n";
-    $receipt .= $line;
+        // HEADER (DIPAKSA LURUS)
+        $receipt .= str_pad('No. Transaksi', 16) . ": " . substr($transaction->transaction_code, 0, 14) . "\n";
+        $receipt .= str_pad('Pelanggan', 16) . ": " . substr($transaction->pelanggan_name ?: '-', 0, 14) . "\n";
+        $receipt .= $line;
 
-    foreach ($details as $detail) {
-        $product = $detail->product;
+        foreach ($details as $detail) {
+            $product = $detail->product;
 
-        $receipt .= str_pad('Produk', 16) . ": " . substr($product->name, 0, 14) . "\n";
-        $receipt .= str_pad('Qty', 16) . ": " . $detail->quantity . "\n";
-        $receipt .= str_pad('Harga', 16) . ": Rp " . number_format($detail->price, 0, ',', '.') . "\n";
+            $receipt .= str_pad('Produk', 16) . ": " . substr($product->name, 0, 14) . "\n";
+            $receipt .= str_pad('Qty', 16) . ": " . $detail->quantity . "\n";
+            $receipt .= str_pad('Harga', 16) . ": Rp " . number_format($detail->price, 0, ',', '.') . "\n";
 
-        if ($detail->diskon_id) {
-            $diskon = DiskonProduk::find($detail->diskon_id);
-            if ($diskon) {
-                $receipt .= str_pad('Diskon', 16) . ": " . $diskon->diskon_percentage . "%\n";
+            if ($detail->diskon_id) {
+                $diskon = DiskonProduk::find($detail->diskon_id);
+                if ($diskon) {
+                    $receipt .= str_pad('Diskon', 16) . ": " . $diskon->diskon_percentage . "%\n";
+                }
             }
+
+            $receipt .= str_pad('Subtotal', 16) . ": Rp " . number_format($detail->line_total, 0, ',', '.') . "\n";
+            $receipt .= $line;
         }
 
-        $receipt .= str_pad('Subtotal', 16) . ": Rp " . number_format($detail->line_total, 0, ',', '.') . "\n";
+        // TOTALAN (KANAN RAPI)
+        $receipt .= str_pad('Subtotal', 18) . "Rp " . number_format($transaction->subtotal, 0, ',', '.') . "\n";
+        $receipt .= str_pad('Diskon', 18) . "Rp " . number_format($transaction->diskon_item, 0, ',', '.') . "\n";
+        $receipt .= str_pad('Voucher', 18) . "Rp " . number_format($transaction->potongan_voucher, 0, ',', '.') . "\n";
         $receipt .= $line;
+
+        $receipt .= str_pad('PPN ' . $transaction->tax . '%', 18)
+            . "Rp " . number_format($transaction->tax_amount, 0, ',', '.') . "\n";
+
+        $receipt .= str_pad('TOTAL BAYAR', 18)
+            . "Rp " . number_format($transaction->total, 0, ',', '.') . "\n";
+
+        $receipt .= $line;
+
+        $receipt .= str_pad('Dibayar', 18)
+            . "Rp " . number_format($transaction->dibayar, 0, ',', '.') . "\n";
+
+        $receipt .= str_pad('Kembalian', 18)
+            . "Rp " . number_format($transaction->kembalian, 0, ',', '.') . "\n";
+
+        $receipt .= str_pad('Metode Bayar', 16) . ": " . strtoupper($transaction->payment_method) . "\n";
+        $receipt .= $line;
+
+        $receipt .= str_pad('Terima kasih atas kunjungan Anda', 32, ' ', STR_PAD_BOTH) . "\n";
+        $receipt .= $line;
+
+        return $receipt;
     }
-
-    // TOTALAN (KANAN RAPI)
-    $receipt .= str_pad('Subtotal', 18) . "Rp " . number_format($transaction->subtotal, 0, ',', '.') . "\n";
-    $receipt .= str_pad('Diskon', 18)   . "Rp " . number_format($transaction->diskon_item, 0, ',', '.') . "\n";
-    $receipt .= str_pad('Voucher', 18)  . "Rp " . number_format($transaction->potongan_voucher, 0, ',', '.') . "\n";
-    $receipt .= $line;
-
-    $receipt .= str_pad('PPN ' . $transaction->tax . '%', 18)
-        . "Rp " . number_format($transaction->tax_amount, 0, ',', '.') . "\n";
-
-    $receipt .= str_pad('TOTAL BAYAR', 18)
-        . "Rp " . number_format($transaction->total, 0, ',', '.') . "\n";
-
-    $receipt .= $line;
-
-    $receipt .= str_pad('Dibayar', 18)
-        . "Rp " . number_format($transaction->dibayar, 0, ',', '.') . "\n";
-
-    $receipt .= str_pad('Kembalian', 18)
-        . "Rp " . number_format($transaction->kembalian, 0, ',', '.') . "\n";
-
-    $receipt .= str_pad('Metode Bayar', 16) . ": " . strtoupper($transaction->payment_method) . "\n";
-    $receipt .= $line;
-
-    $receipt .= str_pad('Terima kasih atas kunjungan Anda', 32, ' ', STR_PAD_BOTH) . "\n";
-    $receipt .= $line;
-
-    return $receipt;
-}
 
 
 
