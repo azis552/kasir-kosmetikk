@@ -19,8 +19,8 @@ class ProductController extends Controller
     {
         // Ambil parameter pencarian dan pengurutan
         $search = $request->get('search');
-        $sort = $request->get('sort', 'name');     // Default kolom untuk sort adalah 'name'
-        $direction = $request->get('direction', 'asc'); // Default pengurutan adalah 'asc'
+        $sort = $request->get('sort', 'id');     // Default kolom untuk sort adalah 'name'
+        $direction = $request->get('direction', 'desc'); // Default pengurutan adalah 'desc'
 
         // Query untuk mencari dan mengurutkan data
         $query = Products::query();
