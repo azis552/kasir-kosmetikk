@@ -30,7 +30,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="code" class="form-label">Kode Voucher</label>
-                                <input type="text" class="form-control" name="code" id="code" value="{{ old('code') }}" required>
+                                <input type="text" class="form-control" name="code" id="code" autofocus value="{{ old('code') }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="status" class="form-label">Status</label>

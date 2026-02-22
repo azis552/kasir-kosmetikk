@@ -22,7 +22,7 @@
                         @method('PUT')
                         <div class="mb-3">
                             <label for="name" class="form-label">Category Name</label>
-                            <input type="text" class="form-control" name="name" id="name"
+                            <input type="text" autofocus class="form-control" name="name" id="name"
                                 value="{{ $productCategory->name }}" required>
                         </div>
 

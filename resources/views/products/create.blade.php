@@ -31,7 +31,7 @@
                         <div class="row mb-3">
                              <div class="col-md-6">
                                 <label for="barcode" class="form-label">Barcode</label>
-                                <input type="text" class="form-control" name="barcode" id="barcode">
+                                <input type="text" class="form-control" autofocus name="barcode" id="barcode">
                                 <span>Contoh: 123456789 </span>
                             </div>
                             <div class="col-md-6">
@@ -65,7 +65,7 @@
                             <div class="col-md-6">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-control" name="is_active" id="is_active" required>
-                                    <option value="1">Aktif</option>
+                                    <option value="1" selected>Aktif</option>
                                     <option value="0">Tidak Aktif</option>
                                 </select>
                             </div>
@@ -80,7 +80,6 @@
                              <div class="col-md-6">
                                 <label for="category_id" class="form-label">Kategori Produk</label>
                                 <select class="form-control" name="category_id" id="category_id" required>
-                                    <option value="">-- Pilih Kategori --</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach

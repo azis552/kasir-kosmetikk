@@ -250,7 +250,7 @@
                             <div class="mb-2 fw-semibold">Metode Pembayaran</div>
                             <select name="payment_method" id="paymentMethod" class="form-select mb-2">
                                 <option value="">Pilih Metode</option>
-                                <option value="cash">Tunai</option>
+                                <option value="cash" selected>Tunai</option>
                                 <option value="qris">QRIS</option>
                                 <option value="debit">Kartu Debit</option>
                                 <option value="credit">Kartu Kredit</option>

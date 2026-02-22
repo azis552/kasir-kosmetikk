@@ -28,12 +28,12 @@
                         class="shadow p-4 rounded-lg bg-white">
                         @csrf
                         @method('PUT')
-                        <h4 class="mb-4">Tambah Produk</h4>
+                        <h4 class="mb-4">Edit Produk</h4>
 
                         <div class="row mb-3">
                              <div class="col-md-6">
                                 <label for="barcode" class="form-label">Barcode</label>
-                                <input type="text" class="form-control" name="barcode" value="{{ $product->barcode }}" id="barcode">
+                                <input type="text" class="form-control" name="barcode" autofocus value="{{ $product->barcode }}" id="barcode">
                                 <span>Contoh: 123456789 </span>
                             </div>
                             <div class="col-md-6">

@@ -33,7 +33,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Nama Produk</label>
-                                <input type="text" disabled class="form-control" name="name" value="{{ $diskon->product->name }}"
+                                <input type="text" disabled class="form-control" name="name" autofocus value="{{ $diskon->product->name }}"
                                     id="name" required>
                             </div>
                             <div class="col-md-6">
@@ -80,7 +80,7 @@
                             <div class="col-md-4">
                                 <label for="status" class="form-label">Status Diskon</label>
                                 <select class="form-control" name="status" id="status" required>
-                                    <option value="true" {{ old('status',$diskon->is_Active) == 'true' ? 'selected' : '' }}>
+                                    <option value="true"  {{ old('status',$diskon->is_Active) == 'true' ? 'selected' : '' }}>
                                         Aktif</option>
                                     <option value="false" {{ old('status', $diskon->is_Active) == 'false' ? 'selected' : '' }}>
                                         Tidak Aktif</option>

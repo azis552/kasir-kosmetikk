@@ -28,7 +28,7 @@
                         class="shadow p-4 rounded-lg bg-white">
                         @csrf
                         @method('PUT')
-                        <h4 class="mb-4">Tambah Produk</h4>
+                        <h4 class="mb-4">Update Stok Produk</h4>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -46,14 +46,13 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="change_amount"> Quantity Product </label>
-                                <input type="number" class="form-control" name="change_amount" id="change_amount">
+                                <label for="change_amount"> Jumlah Produk </label>
+                                <input type="number" autofocus class="form-control" name="change_amount" id="change_amount">
                             </div>
                             <div class="col-md-6">
                                 <label for="movement_type"> Tipe </label>
                                 <select class="form-control" name="movement_type" id="movement_type" required>
-                                    <option value="">-- Pilih Tipe --</option>
-                                    <option value="in">Masuk</option>
+                                    <option value="in" selected>Masuk</option>
                                     <option value="out">Keluar</option>
                                 </select>
                             </div>

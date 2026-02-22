@@ -22,7 +22,7 @@
 
                         <div class="form-group">
                             <label for="name">Role Name</label>
-                            <input type="text" name="name" class="form-control" value="{{ $role->name }}" required>
+                            <input type="text" name="name"  autofocus class="form-control" value="{{ $role->name }}" required>
                         </div>
 
                         <div class="form-group">

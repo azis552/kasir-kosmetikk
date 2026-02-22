@@ -23,7 +23,7 @@
 
                     <!-- Form Pencarian -->
                     <form action="{{ route('products.index') }}" method="GET" class="d-flex form-inline mb-3">
-                        <input type="text" name="search" class="form-control" placeholder="Search by Product Barcode, Name..."
+                        <input autofocus type="text" name="search" class="form-control" placeholder="Search by Product Barcode, Name..."
                             value="{{ request()->search }}" autofocus>
                         <button type="submit" class="btn btn-primary ml-2">Search</button>
                     </form>

@@ -33,7 +33,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Nama Produk</label>
-                                <input type="text" disabled class="form-control" name="name" value="{{ $product->name }}"
+                                <input type="text" disabled class="form-control"  name="name" value="{{ $product->name }}"
                                     id="name" required>
                             </div>
                             <div class="col-md-6">
@@ -49,7 +49,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="price" class="form-label">Diskon (%)</label>
-                                <input type="text" class="form-control" name="diskon_percentage" id="diskon_percentage"
+                                <input type="text" class="form-control" autofocus name="diskon_percentage" id="diskon_percentage"
                                     value="{{ $product->discount ?? old('diskon_percentage')}}" min="0" max="100" required>
                             </div>
                             <div class="col-md-4">

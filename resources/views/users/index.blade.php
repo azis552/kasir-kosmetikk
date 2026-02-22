@@ -18,7 +18,7 @@
 
                     <!-- Form Pencarian -->
                     <form action="{{ route('users.index') }}" method="GET" class=" d-flex form-inline  mb-3">
-                        <input type="text" name="search" class="form-control" placeholder="Search..."
+                        <input autofocus type="text" name="search" class="form-control" placeholder="Search..."
                             value="{{ request()->search }}">
                         <button type="submit" class="btn btn-primary ml-2">Search</button>
                     </form>

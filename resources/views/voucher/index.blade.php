@@ -19,7 +19,7 @@
 
                     <!-- Form Pencarian -->
                     <form action="{{ route('vouchers.index') }}" method="GET" class="d-flex form-inline mb-3">
-                        <input type="text" name="search" class="form-control" placeholder="Search by Kode Voucher..."
+                        <input type="text" autofocus name="search" class="form-control" placeholder="Search by Kode Voucher..."
                             value="{{ request()->search }}">
                         <button type="submit" class="btn btn-primary ml-2">Search</button>
                     </form>

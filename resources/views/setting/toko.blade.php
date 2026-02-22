@@ -45,7 +45,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Nama Toko</label>
                                 <input type="text" class="form-control" name="store_name"
-                                    value="{{ old('store_name', $setting->store_name) }}" required>
+                                    value="{{ old('store_name', $setting->store_name) }}" autofocus required>
                             </div>
 
                             <div class="row g-2">

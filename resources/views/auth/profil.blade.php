@@ -25,7 +25,7 @@
                             <!-- Nama -->
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nama</label>
-                                <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}"
+                                <input type="text" name="name" autofocus class="form-control" value="{{ auth()->user()->name }}"
                                     required>
                             </div>
 

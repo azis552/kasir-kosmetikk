@@ -76,7 +76,7 @@
 
 
                                 <div class="form-group mb-3">
-                                    <input type="text" class="form-control" id="floatingInput" name="name"
+                                    <input type="text" class="form-control" autofocus id="floatingInput" name="name"
                                         placeholder="Name Address" />
                                 </div>
                                 <div class="form-group mb-3">

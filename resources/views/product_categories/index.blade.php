@@ -21,7 +21,7 @@
 
                     <!-- Form Pencarian -->
                     <form action="{{ route('product_categories.index') }}" method="GET" class="d-flex form-inline mb-3">
-                        <input type="text" name="search" class="form-control" placeholder="Search by Category Name..."
+                        <input autofocus type="text" name="search" class="form-control" placeholder="Search by Category Name..."
                             value="{{ request()->search }}">
                         <button type="submit" class="btn btn-primary ml-2">Search</button>
                     </form>
