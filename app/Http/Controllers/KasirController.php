@@ -398,7 +398,6 @@ class KasirController extends Controller
         $transactionId = $request->input('transactionId');
         $transaction = Transaction::find($transactionId);
 
-
         if (!$transaction) {
             return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan']);
         }

@@ -831,7 +831,7 @@ $('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
                     ""); // Hapus karakter selain angka dan hilangkan koma
                 const kembalian = $('#kembalian').text().replace(/[^0-9,-]+/g, "");
                 const paymentMethod = $('#paymentMethod').val();
-                const pelanggan = $('pelanggan').val();
+                const pelanggan = $('#pelanggan').val();
                 const tax_rate = {{ App\Helpers\FormatHelper::tax() }};
                 const tax_amount = $('#tax').text().replace(/[^0-9,-]+/g, "").replace(",", "");
 
