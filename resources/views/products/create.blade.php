@@ -44,11 +44,11 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label for="HargaBeli" class="form-label">Harga Beli</label>
-                                <input type="text" class="form-control" name="price_buy" id="price_buy" required>
+                                <input type="number" class="form-control" name="price_buy" id="price_buy" required>
                             </div>
                             <div class="col-md-4">
                                 <label for="price" class="form-label">Harga Jual</label>
-                                <input type="text" class="form-control" name="price_sell" id="price" required>
+                                <input type="number" class="form-control" name="price_sell" id="price" required>
                             </div>
                             
                             <div class="col-md-4">
@@ -106,7 +106,7 @@
 @endsection
 
 @section('script')
-    <!-- Tambahkan Script untuk Masking -->
+    Tambahkan Script untuk Masking
     <script>
         $(document).ready(function() {
             // Apply Inputmask for the price field with prefix 'Rp' and thousands separator

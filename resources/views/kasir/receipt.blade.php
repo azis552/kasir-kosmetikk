@@ -216,3 +216,13 @@
 </body>
 
 </html>
+
+<script>
+  window.addEventListener("load", () => {
+    window.print();
+  });
+
+  window.addEventListener("afterprint", () => {
+    window.electronAPI.closeStrukWindow();
+  });
+</script>

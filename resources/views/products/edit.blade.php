@@ -46,18 +46,18 @@
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label for="price" class="form-label">Harga Beli</label>
-                                <input type="text" class="form-control"
-                                    value="{{ App\Helpers\FormatHelper::formatRupiah($product->price_buy) }}"
+                                <label for="price_buy" class="form-label">Harga Beli</label>
+                                <input type="number" class="form-control"
+                                    value="{{ $product->price_buy }}"
                                     placeholder="{{ App\Helpers\FormatHelper::formatRupiah($product->price_buy) }}"
                                     name="price_buy" id="price_buy" required>
                             </div>
                             <div class="col-md-4">
-                                <label for="price" class="form-label">Harga</label>
-                                <input type="text" class="form-control"
-                                    value="{{ App\Helpers\FormatHelper::formatRupiah($product->price) }}"
+                                <label for="price_sell" class="form-label">Harga Jual</label>
+                                <input type="number" class="form-control"
+                                    value="{{ $product->price }}"
                                     placeholder="{{ App\Helpers\FormatHelper::formatRupiah($product->price) }}"
-                                    name="price_sell" id="price" required>
+                                    name="price_sell" id="price_sell" required>
                             </div>
                             <div class="col-md-4">
                                 <label for="min_stock" class="form-label">Min Stok</label>
@@ -123,7 +123,7 @@
 
 @section('script')
     <!-- Tambahkan Script untuk Masking -->
-    <script>
+    <!-- <script>
         $(document).ready(function() {
             // Apply Inputmask for the price field with prefix 'Rp' and thousands separator
             Inputmask({
@@ -147,5 +147,5 @@
                 placeholder: "0"
             }).mask('#price_buy');
         })
-    </script>
+    </script> -->
 @endsection
