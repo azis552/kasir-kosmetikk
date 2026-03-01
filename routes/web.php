@@ -38,14 +38,14 @@ Route::middleware(['auth', 'log.user.activity'])->group(function () {
     Route::resource('kasir', KasirController::class);
     Route::middleware(['role:kasir'])->group(function () {
         Route::get('/dashboard/kasir', [DashboardController::class, 'kasir'])->name('dashboard.kasir');
-         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+       
     });
-
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
     
 
 });
 Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function () {
-    
+      
     
     Route::resource('products', ProductController::class);
     // Menampilkan daftar pengguna
