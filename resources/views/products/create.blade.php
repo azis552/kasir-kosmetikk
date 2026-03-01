@@ -60,7 +60,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="unit" class="form-label">Satuan</label>
-                                <input type="text" class="form-control" name="unit" id="unit" required>
+                                <input type="text" class="form-control" name="unit" id="unit" value="pcs" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="status" class="form-label">Status</label>
