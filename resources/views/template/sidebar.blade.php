@@ -16,9 +16,7 @@
 
     <!-- [Favicon] icon -->
     <link rel="icon" href="{{ store_logo('icon') }}" type="image/x-icon" />
-    <!-- [Font] Family -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap"
-        rel="stylesheet" />
+
     <!-- [phosphor Icons] https://phosphoricons.com/ -->
     <link rel="stylesheet" href="{{ asset('assets/fonts/phosphor/regular/style.css') }}" />
     <!-- [Tabler Icons] https://tablericons.com -->
@@ -31,9 +29,7 @@
 
     <!-- Load Inputmask (ensure it's placed after jQuery) -->
     <script src="{{ asset('assets/js/plugins/inputmask.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-14K1GBX9FG"></script>
+    <script src="{{ asset('assets/js/plugins/sweetalert.js') }}"></script>
     <style>
         .disabled-link {
             pointer-events: none;
