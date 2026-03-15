@@ -3,6 +3,30 @@
 
 @section('content')
     <style>
+        /* Jam realtime */
+        .pos-clock {
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.04em;
+            color: #fff;
+            background: linear-gradient(135deg, #16a34a, #06b6d4);
+            border-radius: 10px;
+            padding: 6px 14px;
+            min-width: 130px;
+            text-align: center;
+            line-height: 1.3;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+        }
+
+        .pos-clock .clock-date {
+            font-size: 0.65rem;
+            font-weight: 500;
+            opacity: 0.88;
+            display: block;
+            letter-spacing: 0.02em;
+        }
+
         /* Sembunyikan tombol toggle mobile di POS */
         body.pos-mode .pc-mob-drp,
         body.pos-mode .pc-sidebar-popup,
@@ -120,14 +144,17 @@
                                     <button class="btn btn-success" type="button" id="btnTambah">Tambah</button>
                                 </div>
 
-                                <div class="d-flex gap-2">
-
-
+                                <div class="d-flex gap-2 align-items-center">
                                     <button class="btn btn-outline-danger" id="batal" type="button">
                                         Batal Transaksi
                                     </button>
-                                </div>
 
+                                    {{-- ✅ JAM REALTIME --}}
+                                    <div class="pos-clock" id="posClock">
+                                        <span id="clockTime">00:00:00</span>
+                                        <span class="clock-date" id="clockDate">-</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Tabel item -->
@@ -164,7 +191,7 @@
 
                                 <div class="alert alert-info py-2 px-3 mt-3 small d-flex align-items-center">
                                     <i class="fa fa-keyboard me-2"></i>
-                                    
+
                                 </div>
                             </div>
 
@@ -410,42 +437,42 @@
                         $('#voucherInfo').html(
 
                             `<div class="d-flex align-items-center gap-2">
-                                                                                                                                <button id="btnRemoveVoucher" 
-                                                                                                                                data-id="${response.vouchers.id}" 
-                                                                                                                                data-transaksi="${response.transactionId}"
-                                                                                                                                class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
-                                                                                                                            </div>`
+                                                                                                                                            <button id="btnRemoveVoucher" 
+                                                                                                                                            data-id="${response.vouchers.id}" 
+                                                                                                                                            data-transaksi="${response.transactionId}"
+                                                                                                                                            class="btn btn-sm btn-outline-danger">Hapus Voucher</button>
+                                                                                                                                        </div>`
                         )
                     }
 
 
                     response.items.forEach(function (item) {
                         let row = `<tr>
-                                                                                                                                    <td>
-                                                                                                                                        <div class="d-flex align-items-center gap-2">
-                                                                                                                                            <div>
-                                                                                                                                                <div class="fw-semibold">${item.product_name}</div>
-                                                                                                                                                <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
-                                                                                                                                            </div>
-                                                                                                                                        </div>
-                                                                                                                                    </td>
-                                                                                                                                    <td class="text-end money" data-price="${item.price}">${item.price}</td>
-                                                                                                                                    <td class="text-center">
-                                                                                                                                        <div class="d-inline-flex align-items-center gap-1">
-                                                                                                                                            <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
-                                                                                                                                            <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" style="width:60px;">
-                                                                                                                                            <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
+                                                                                                                                                <td>
+                                                                                                                                                    <div class="d-flex align-items-center gap-2">
+                                                                                                                                                        <div>
+                                                                                                                                                            <div class="fw-semibold">${item.product_name}</div>
+                                                                                                                                                            <div class="small text-muted">Stok: ${item.stock} · Barcode: ${item.barcode}</div>
+                                                                                                                                                        </div>
+                                                                                                                                                    </div>
+                                                                                                                                                </td>
+                                                                                                                                                <td class="text-end money" data-price="${item.price}">${item.price}</td>
+                                                                                                                                                <td class="text-center">
+                                                                                                                                                    <div class="d-inline-flex align-items-center gap-1">
+                                                                                                                                                        <button class="btn btn-sm btn-outline-secondary qty-decrease" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Kurangi Qty">−</button>
+                                                                                                                                                        <input class="form-control form-control-sm text-center qty-input" type="number" min="1" value="${item.quantity}" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" style="width:60px;">
+                                                                                                                                                        <button class="btn btn-sm btn-outline-secondary qty-increase" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Tambah Qty">+</button>
 
 
-                                                                                                                                        </div>
-                                                                                                                                    </td>
-                                                                                                                                    <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
+                                                                                                                                                    </div>
+                                                                                                                                                </td>
+                                                                                                                                                <td class="text-end fw-semibold sub-totalori money" data-subtotal>${item.price * item.quantity}</td>
 
 
-                                                                                                                                    <td class="text-center" style="min-width:100px;">
-                                                                                                                                        <div class="discount-box"
-                                                                                                                                            data-transaksi="${item.transaction_id}"
-                                                                                                                                            data-product="${item.product_id}">`;
+                                                                                                                                                <td class="text-center" style="min-width:100px;">
+                                                                                                                                                    <div class="discount-box"
+                                                                                                                                                        data-transaksi="${item.transaction_id}"
+                                                                                                                                                        data-product="${item.product_id}">`;
 
                         const applied = Array.isArray(item.applied_discount_ids) ? item
                             .applied_discount_ids : [];
@@ -461,39 +488,39 @@
 
 
                             row += `
-                                                                                                            <div class="form-check text-start d-flex align-items-center gap-2">
-                                                                                                                <input
-                                                                                                                    class="form-check-input discount-check"
-                                                                                                                    type="radio"  
-                                                                                                                    data-nominal="${totalNominalDiskon}"
-                                                                                                                    name="discount-${item.product_id}" 
-                                                                                                                    value="${disc.id}"
-                                                                                                                    ${checked ? 'checked' : ''}
-                                                                                                                    ${disabled ? 'disabled' : ''}
-                                                                                                                >
-                                                                                                                <label class="form-check-label d-flex flex-column gap-1">
-                                                                                                                    <div class="d-flex align-items-center gap-2">
-                                                                                                                        <span>${disc.percentage}%</span>
-                                                                                                                        <span class="badge bg-success">Min ${disc.min_qty}</span>
-                                                                                                                    </div>
-                                                                                                                    <small class="text-muted diskon-item">
-                                                                                                                        -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
-                                                                                                                    </small>
-                                                                                                                </label>
-                                                                                                            </div>
-                                                                                                        `;
+                                                                                                                        <div class="form-check text-start d-flex align-items-center gap-2">
+                                                                                                                            <input
+                                                                                                                                class="form-check-input discount-check"
+                                                                                                                                type="radio"  
+                                                                                                                                data-nominal="${totalNominalDiskon}"
+                                                                                                                                name="discount-${item.product_id}" 
+                                                                                                                                value="${disc.id}"
+                                                                                                                                ${checked ? 'checked' : ''}
+                                                                                                                                ${disabled ? 'disabled' : ''}
+                                                                                                                            >
+                                                                                                                            <label class="form-check-label d-flex flex-column gap-1">
+                                                                                                                                <div class="d-flex align-items-center gap-2">
+                                                                                                                                    <span>${disc.percentage}%</span>
+                                                                                                                                    <span class="badge bg-success">Min ${disc.min_qty}</span>
+                                                                                                                                </div>
+                                                                                                                                <small class="text-muted diskon-item">
+                                                                                                                                    -Rp ${Math.round(totalNominalDiskon).toLocaleString('id-ID')}
+                                                                                                                                </small>
+                                                                                                                            </label>
+                                                                                                                        </div>
+                                                                                                                    `;
                             totalNominalDiskon = 0;
                         });
 
 
                         row += `</div>
-                                                                                                                                    </td>
+                                                                                                                                                </td>
 
-                                                                                                                                    <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
-                                                                                                                                    <td class="text-center">
-                                                                                                                                        <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
-                                                                                                                                    </td>
-                                                                                                                                </tr>`;
+                                                                                                                                                <td class="text-end fw-semibold money sub-total" data-subtotal>${item.line_total}</td>
+                                                                                                                                                <td class="text-center">
+                                                                                                                                                    <button class="btn btn-sm btn-outline-secondary hapus" data-transaksi="${item.transaction_id}" data-product="${item.product_id}" title="Hapus">🗑️</button>
+                                                                                                                                                </td>
+                                                                                                                                            </tr>`;
 
                         cartBody.append(row);
 
@@ -511,80 +538,80 @@
                     });
 
                     // ===============================
-// HITUNG TOTAL FINAL SUPER AMAN
-// ===============================
+                    // HITUNG TOTAL FINAL SUPER AMAN
+                    // ===============================
 
-let subtotal = 0;
-let diskonItem = 0;
+                    let subtotal = 0;
+                    let diskonItem = 0;
 
-// 1️⃣ Hitung subtotal
-$('.sub-totalori').each(function () {
-    subtotal += Number($(this).text().replace(/[^\d]/g, '')) || 0;
-});
+                    // 1️⃣ Hitung subtotal
+                    $('.sub-totalori').each(function () {
+                        subtotal += Number($(this).text().replace(/[^\d]/g, '')) || 0;
+                    });
 
-// 2️⃣ Hitung diskon item
-$('.discount-check:checked').each(function () {
-    diskonItem += Math.round(Number($(this).data('nominal')) || 0);
-});
+                    // 2️⃣ Hitung diskon item
+                    $('.discount-check:checked').each(function () {
+                        diskonItem += Math.round(Number($(this).data('nominal')) || 0);
+                    });
 
-// 3️⃣ Voucher
-let voucher = Number(response.vouchers.discount_amount) || 0;
+                    // 3️⃣ Voucher
+                    let voucher = Number(response.vouchers.discount_amount) || 0;
 
-// 4️⃣ Total diskon gabungan
-let totalDiskon = diskonItem + voucher;
+                    // 4️⃣ Total diskon gabungan
+                    let totalDiskon = diskonItem + voucher;
 
-// 🚫 Batasi diskon maksimal = subtotal
-totalDiskon = Math.min(totalDiskon, subtotal);
+                    // 🚫 Batasi diskon maksimal = subtotal
+                    totalDiskon = Math.min(totalDiskon, subtotal);
 
-// 5️⃣ Total setelah diskon
-let totalSetelahDiskon = subtotal - totalDiskon;
+                    // 5️⃣ Total setelah diskon
+                    let totalSetelahDiskon = subtotal - totalDiskon;
 
-// ===============================
-// PAJAK (HANYA JIKA TOTAL > 0)
-// ===============================
+                    // ===============================
+                    // PAJAK (HANYA JIKA TOTAL > 0)
+                    // ===============================
 
-let pajak = 0;
-let totalAkhir = totalSetelahDiskon;
+                    let pajak = 0;
+                    let totalAkhir = totalSetelahDiskon;
 
-@if(App\Helpers\FormatHelper::taxCount() > 0)
-    if (totalSetelahDiskon > 0) {
-        let rate = {{ App\Helpers\FormatHelper::tax() }};
-        pajak = Math.floor(totalSetelahDiskon * rate / 100);
-        totalAkhir += pajak;
-    }
-@endif
+                    @if(App\Helpers\FormatHelper::taxCount() > 0)
+                        if (totalSetelahDiskon > 0) {
+                            let rate = {{ App\Helpers\FormatHelper::tax() }};
+                            pajak = Math.floor(totalSetelahDiskon * rate / 100);
+                            totalAkhir += pajak;
+                        }
+                    @endif
 
-// ===============================
-// FORMAT RUPIAH
-// ===============================
+                    // ===============================
+                    // FORMAT RUPIAH
+                    // ===============================
 
-function rupiah(n) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    }).format(n);
-}
+                    function rupiah(n) {
+                        return new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(n);
+                    }
 
-// ===============================
-// UPDATE UI
-// ===============================
+                    // ===============================
+                    // UPDATE UI
+                    // ===============================
 
-$('#subTotal').text(rupiah(subtotal));
-$('#discItem').text('- ' + rupiah(diskonItem));
-$('#voucherDiscount').text('- ' + rupiah(voucher));
-$('#grandTotal').text(rupiah(totalSetelahDiskon));
-$('#tax').text(rupiah(pajak));
-$('#grandTotalakhir').text(rupiah(totalAkhir));
+                    $('#subTotal').text(rupiah(subtotal));
+                    $('#discItem').text('- ' + rupiah(diskonItem));
+                    $('#voucherDiscount').text('- ' + rupiah(voucher));
+                    $('#grandTotal').text(rupiah(totalSetelahDiskon));
+                    $('#tax').text(rupiah(pajak));
+                    $('#grandTotalakhir').text(rupiah(totalAkhir));
 
-// ===============================
-// KEMBALIAN
-// ===============================
+                    // ===============================
+                    // KEMBALIAN
+                    // ===============================
 
-let paid = Number($('#paid').val().replace(/[^\d]/g, '')) || 0;
-let kembalian = paid - totalAkhir;
+                    let paid = Number($('#paid').val().replace(/[^\d]/g, '')) || 0;
+                    let kembalian = paid - totalAkhir;
 
-$('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
+                    $('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
 
                 } catch (error) {
                     console.error('Error fetching cart:', error);
@@ -940,29 +967,29 @@ $('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
                 const doc = iframe.contentWindow.document;
                 doc.open();
                 doc.write(`
-                                                                        <html>
-                                                                        <head>
-                                                                            <title>Cetak Struk</title>
-                                                                            <style>
-                                                                                @page {
-                                                                                    size: 58mm auto;
-                                                                                    margin: 0;
-                                                                                }
-                                                                                body {
-                                                                                    width: 58mm;
-                                                                                    font-family: monospace;
-                                                                                    font-size: 11px;
-                                                                                    white-space: pre;
-                                                                                    margin: 0;
-                                                                                    padding: 4px;
-                                                                                }
-                                                                            </style>
-                                                                        </head>
-                                                                        <body>
-                                                                ${receiptContent}
-                                                                        </body>
-                                                                        </html>
-                                                                    `);
+                                                                                    <html>
+                                                                                    <head>
+                                                                                        <title>Cetak Struk</title>
+                                                                                        <style>
+                                                                                            @page {
+                                                                                                size: 58mm auto;
+                                                                                                margin: 0;
+                                                                                            }
+                                                                                            body {
+                                                                                                width: 58mm;
+                                                                                                font-family: monospace;
+                                                                                                font-size: 11px;
+                                                                                                white-space: pre;
+                                                                                                margin: 0;
+                                                                                                padding: 4px;
+                                                                                            }
+                                                                                        </style>
+                                                                                    </head>
+                                                                                    <body>
+                                                                            ${receiptContent}
+                                                                                    </body>
+                                                                                    </html>
+                                                                                `);
                 doc.close();
 
                 iframe.onload = function () {
@@ -977,7 +1004,7 @@ $('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
                 const transactionId = $(this).data('transaksi');
                 window.open(`/kasir/cetak/${transactionId}`, '_blank');
             });
-            
+
         });
 
     </script>
@@ -1022,6 +1049,32 @@ $('#kembalian').text(rupiah(kembalian > 0 ? kembalian : 0));
 
         });
     </script>
+    <script>
+        (function () {
+            const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function updateClock() {
+                const now = new Date();
+                const h = pad(now.getHours());
+                const m = pad(now.getMinutes());
+                const s = pad(now.getSeconds());
+                const hari = HARI[now.getDay()];
+                const tgl = now.getDate();
+                const bln = BULAN[now.getMonth()];
+                const thn = now.getFullYear();
+
+                document.getElementById('clockTime').textContent = `${h}:${m}:${s}`;
+                document.getElementById('clockDate').textContent = `${hari}, ${tgl} ${bln} ${thn}`;
+            }
+
+            updateClock();
+            setInterval(updateClock, 1000);
+        })();
+    </script>
+
 
 
 

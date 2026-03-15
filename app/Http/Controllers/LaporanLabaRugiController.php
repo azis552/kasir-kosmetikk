@@ -113,7 +113,7 @@ class LaporanLabaRugiController extends Controller
         $base = DB::table('transactions as t')
             ->joinSub($detailAgg, 'd', fn($j) => $j->on('d.transaction_id', '=', 't.id'))
             ->whereBetween('t.transaction_date', [$start, $end])
-            ->where('t.status', 'paid'); // sesuaikan jika statusmu beda
+            ->where('t.status', 'PAID'); // sesuaikan jika statusmu beda
 
         $summary = (clone $base)->selectRaw('
             COALESCE(SUM(t.subtotal - COALESCE(t.potongan_voucher,0)),0) as net_sales_ex_tax,

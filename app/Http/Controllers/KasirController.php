@@ -252,69 +252,56 @@ class KasirController extends Controller
             $newQty = (int) $request->qty;
 
             if ($newQty < 1) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Quantity minimal 1'
-                ], 400);
+                return response()->json(['success' => false, 'error' => 'Quantity minimal 1'], 400);
             }
 
             if ($newQty > $detail->stock_product->quantity) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Stok produk tidak mencukupi'
-                ], 400);
+                return response()->json(['success' => false, 'error' => 'Stok produk tidak mencukupi'], 400);
             }
 
             $detail->quantity = $newQty;
-        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | MODE 2: Tombol + / -
-        |--------------------------------------------------------------------------
-        */ elseif ($request->has('increase')) {
+            /*
+            |--------------------------------------------------------------------------
+            | MODE 2: Tombol + / -
+            |--------------------------------------------------------------------------
+            */
+        } elseif ($request->has('increase')) {
 
             $increase = filter_var($request->increase, FILTER_VALIDATE_BOOLEAN);
 
             if ($increase) {
-
                 if ($detail->quantity + 1 > $detail->stock_product->quantity) {
-                    return response()->json([
-                        'success' => false,
-                        'error' => 'Stok produk tidak mencukupi'
-                    ], 400);
+                    return response()->json(['success' => false, 'error' => 'Stok produk tidak mencukupi'], 400);
                 }
-
                 $detail->quantity += 1;
-
             } else {
-
                 if ($detail->quantity <= 1) {
-                    return response()->json([
-                        'success' => false,
-                        'error' => 'Quantity minimal 1'
-                    ], 400);
+                    return response()->json(['success' => false, 'error' => 'Quantity minimal 1'], 400);
                 }
-
                 $detail->quantity -= 1;
             }
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Hitung Ulang Line Total
+        | FIX: Hitung Ulang Line Total
+        | Sebelumnya: DiskonProduk::find($detail->discount) → salah, discount = nominal rupiah
+        | Sesudah:    DiskonProduk::find($detail->diskon_id) → benar, diskon_id = ID diskon
         |--------------------------------------------------------------------------
         */
-        if ($detail->discount != null) {
-
-            $diskon = DiskonProduk::find($detail->discount);
-
+        if ($detail->diskon_id) {
+            $diskon = DiskonProduk::find($detail->diskon_id);
             if ($diskon) {
-                $percentage = $diskon->diskon_percentage;
-
-                $detail->line_total =
-                    ($detail->price - (($percentage / 100) * $detail->price))
+                $detail->line_total = ($detail->price - (($diskon->diskon_percentage / 100) * $detail->price))
                     * $detail->quantity;
+                // update nominal discount juga sesuai qty baru
+                $detail->discount = ($detail->price * ($diskon->diskon_percentage / 100)) * $detail->quantity;
+            } else {
+                // diskon sudah dihapus, reset
+                $detail->discount = 0;
+                $detail->diskon_id = null;
+                $detail->line_total = $detail->price * $detail->quantity;
             }
         } else {
             $detail->line_total = $detail->price * $detail->quantity;
@@ -329,33 +316,64 @@ class KasirController extends Controller
     {
         $userId = auth()->id();
 
-        $mac = (new \App\Helpers\FormatHelper)->getMacAddress();
-
-        $terminalId = $mac;
-
         $transaction = Transaction::where('user_id', $userId)
             ->where('status', 'DRAFT')
             ->first();
 
+        if (!$transaction) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada transaksi aktif']);
+        }
+
         $voucherId = $request->input('voucher');
         if (empty($voucherId)) {
-            return response()->json(['success' => false, 'message' => 'Voucher tidak boleh kosong']);
+            return response()->json(['success' => false, 'message' => 'Kode voucher tidak boleh kosong']);
         }
 
+        // ── FIX: cari voucher dengan semua validasi sekaligus ──
         $voucher = Voucher::where('code', $voucherId)->first();
 
-        if ($voucher->max_uses <= $voucher->uses) {
-            return response()->json(['success' => false, 'message' => 'Voucher sudah tidak tersedia untuk di gunakan']);
-        } else {
-            $transaction->voucher = $voucher->id;
-            $transaction->potongan_voucher = $voucher->discount_amount;
-            $transaction->save();
-            $voucher->uses += 1;
-            $voucher->save();
+        // 1. Voucher tidak ditemukan
+        if (!$voucher) {
+            return response()->json(['success' => false, 'message' => 'Kode voucher tidak ditemukan']);
         }
 
-        return response()->json(['success' => true]);
+        // 2. Voucher tidak aktif
+        if (!$voucher->is_active) {
+            return response()->json(['success' => false, 'message' => 'Voucher tidak aktif']);
+        }
 
+        // 3. Belum mulai berlaku
+        if (now()->toDateString() < $voucher->start_date) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Voucher belum berlaku. Berlaku mulai ' .
+                    \Carbon\Carbon::parse($voucher->start_date)->format('d M Y'),
+            ]);
+        }
+
+        // 4. Sudah kadaluarsa
+        if (now()->toDateString() > $voucher->end_date) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Voucher sudah kadaluarsa sejak ' .
+                    \Carbon\Carbon::parse($voucher->end_date)->format('d M Y'),
+            ]);
+        }
+
+        // 5. Kuota habis
+        if ($voucher->max_uses > 0 && $voucher->uses >= $voucher->max_uses) {
+            return response()->json(['success' => false, 'message' => 'Voucher sudah tidak tersedia, kuota habis']);
+        }
+
+        // ── Semua validasi lolos, terapkan voucher ──
+        $transaction->voucher = $voucher->id;
+        $transaction->potongan_voucher = $voucher->discount_amount;
+        $transaction->save();
+
+        $voucher->uses += 1;
+        $voucher->save();
+
+        return response()->json(['success' => true]);
     }
 
     public function removeVoucher(Request $request)
@@ -546,8 +564,31 @@ class KasirController extends Controller
     public function batal(Request $request)
     {
         $transactionId = $request->input('transactionId');
-        $details = TransactionDetail::where('transaction_id', $transactionId);
-        $details->delete();
+
+        $transaction = Transaction::where('id', $transactionId)
+            ->where('status', 'DRAFT')
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan']);
+        }
+
+        // FIX: kembalikan uses voucher jika transaksi DRAFT punya voucher
+        if ($transaction->voucher) {
+            $voucher = Voucher::find($transaction->voucher);
+            if ($voucher && $voucher->uses > 0) {
+                $voucher->uses -= 1;
+                $voucher->save();
+            }
+            // Lepas voucher dari transaksi
+            $transaction->voucher = null;
+            $transaction->potongan_voucher = 0;
+            $transaction->save();
+        }
+
+        // Hapus semua detail transaksi
+        TransactionDetail::where('transaction_id', $transactionId)->delete();
+
         return response()->json(['success' => true]);
     }
 
@@ -569,7 +610,7 @@ class KasirController extends Controller
     public function show($id)
     {
 
-       $transaction = Transaction::find($id);
+        $transaction = Transaction::find($id);
         if (!$transaction) {
             abort(404, 'Transaksi tidak ditemukan');
         }
@@ -577,8 +618,8 @@ class KasirController extends Controller
         $details = TransactionDetail::where('transaction_id', $transaction->id)
             ->with(['product', 'stock_product', 'diskons'])
             ->get();
-$title = "Riwayat Transaksi";
-      
+        $title = "Riwayat Transaksi";
+
         return view('kasir.detail_transaksi', compact('transaction', 'details', 'title'));
     }
 

@@ -15,15 +15,31 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Commands\Show;
 
+// =====================================================
+// PUBLIC — halaman login
+// =====================================================
 Route::get('/', function () {
     return view('auth.login');
 });
+
+// =====================================================
+// AUTHENTICATED — semua user yang sudah login
+// (kasir & admin boleh akses ini)
+// =====================================================
 Route::middleware(['auth', 'log.user.activity'])->group(function () {
-    
-    Route::get('kasir/cetak/{id}', [KasirController::class, 'cetak'])->name('kasir.cetak');
+
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // ----- Dashboard: redirect ke dashboard sesuai role -----
+    // FIX: dashboard.kasir dibuka untuk role 'kasir' DAN 'admin'
+    // karena DashboardController@index bisa redirect admin ke sini
+    Route::get('/dashboard/kasir', [DashboardController::class, 'kasir'])
+        ->name('dashboard.kasir')
+        ->middleware('role:kasir|admin'); // ✅ admin juga boleh akses jika perlu
+
+    // ----- Kasir routes (kasir & admin boleh) -----
+    Route::get('kasir/cetak/{id}', [KasirController::class, 'cetak'])->name('kasir.cetak');
     Route::post('kasih/tambah-produk', [KasirController::class, 'tambah_produk'])->name('kasir.tambahProduk');
     Route::get('kasir/keranjang', [KasirController::class, 'tampil_keranjang'])->name('kasir.keranjang');
     Route::post('kasir/updateDiskon', [KasirController::class, 'updateDiskon'])->name('kasir.updateDiskon');
@@ -36,62 +52,57 @@ Route::middleware(['auth', 'log.user.activity'])->group(function () {
     Route::get('transaksis/riwayat', [KasirController::class, 'riwayat'])->name('transaksis.riwayat');
     Route::get('transaksis/{id}/detail', [KasirController::class, 'Show'])->name('transaksis.show');
     Route::resource('kasir', KasirController::class);
-    Route::middleware(['role:kasir'])->group(function () {
-        Route::get('/dashboard/kasir', [DashboardController::class, 'kasir'])->name('dashboard.kasir');
-       
-    });
-Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    
-
 });
+
+// =====================================================
+// ADMIN ONLY — semua route di bawah hanya untuk admin
+// =====================================================
 Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function () {
-      
-    
-    Route::resource('products', ProductController::class);
-    // Menampilkan daftar pengguna
-   
-    // Form untuk membuat pengguna baru
+
+    // Dashboard admin
+    Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
+
+    // ----- User management -----
+    // FIX: users.index dipindah ke sini agar kasir tidak bisa akses
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    // Menyimpan pengguna baru
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    // Form untuk mengedit pengguna
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    // Menyimpan perubahan pengguna
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    // Menghapus pengguna
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // ----- Role management -----
     Route::resource('roles', RoleController::class);
-    Route::resource('product_categories', ProductCategoryController::class);
-    Route::PUT('products/{product}/diskon', [ProductController::class, 'storeDiskon'])->name('products.storeDiskon');
-    Route::get('products/{product}/diskon', [ProductController::class, 'diskon'])->name('products.diskon');
-    Route::put('products/updateStock/{product}', [ProductController::class, 'updateStock'])->name('products.updateStock');
-    Route::get('products/{product}/stock', [ProductController::class, 'stock'])->name('products.stock');
+
+    // ----- Product management -----
+    // PENTING: route statis (stock-alert) harus di atas resource agar tidak tertimpa {product}
     Route::get('/products/stock-alert', [ProductController::class, 'stockAlert'])->name('products.stock-alert');
+    Route::get('products/{product}/stock', [ProductController::class, 'stock'])->name('products.stock');
+    Route::put('products/updateStock/{product}', [ProductController::class, 'updateStock'])->name('products.updateStock');
+    Route::get('products/{product}/diskon', [ProductController::class, 'diskon'])->name('products.diskon');
+    Route::put('products/{product}/diskon', [ProductController::class, 'storeDiskon'])->name('products.storeDiskon');
+    Route::resource('products', ProductController::class);
+
+    // ----- Kategori, Diskon, Voucher, Pajak -----
+    Route::resource('product_categories', ProductCategoryController::class);
     Route::resource('diskon', DiskonController::class);
     Route::resource('vouchers', VoucherController::class);
     Route::resource('taxes', TaxController::class);
+
+    // ----- Laporan -----
     Route::get('laporan/laporan_harian', [LaporanController::class, 'laporan_harian'])->name('laporan.laporan_harian');
     Route::get('laporan/laporan_bulanan', [LaporanController::class, 'laporan_bulanan'])->name('laporan.laporan_bulanan');
     Route::get('laporan/laporan_tahunan', [LaporanController::class, 'laporan_tahunan'])->name('laporan.laporan_tahunan');
-    Route::get('/laporan/laba-rugi/harian', [LaporanLabaRugiController::class, 'harian'])
-        ->name('laporan.laba_rugi_harian');
+    Route::get('/laporan/laba-rugi/harian', [LaporanLabaRugiController::class, 'harian'])->name('laporan.laba_rugi_harian');
+    Route::get('/laporan/laba-rugi/bulanan', [LaporanLabaRugiController::class, 'bulanan'])->name('laporan.laba_rugi_bulanan');
+    Route::get('/laporan/laba-rugi/tahunan', [LaporanLabaRugiController::class, 'tahunan'])->name('laporan.laba_rugi_tahunan');
 
-    Route::get('/laporan/laba-rugi/bulanan', [LaporanLabaRugiController::class, 'bulanan'])
-        ->name('laporan.laba_rugi_bulanan');
-
-    Route::get('/laporan/laba-rugi/tahunan', [LaporanLabaRugiController::class, 'tahunan'])
-        ->name('laporan.laba_rugi_tahunan');
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    });
-
+    // ----- Settings & Theme -----
     Route::get('/settings/toko', [StoreSettingController::class, 'edit'])->name('settings.toko');
     Route::put('/settings/toko', [StoreSettingController::class, 'update'])->name('settings.toko.update');
-
     Route::get('/admin/theme', [ThemeController::class, 'index'])->name('admin.theme');
     Route::post('/admin/theme', [ThemeController::class, 'update'])->name('admin.theme.update');
+
+    // ----- Batal transaksi sudah bayar (khusus admin) -----
     Route::post('/kasir/batal-paid', [KasirController::class, 'batalTransaksiSudahBayar'])->name('kasir.batal.paid');
-
-
-
 });

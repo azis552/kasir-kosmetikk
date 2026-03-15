@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -20,29 +21,49 @@ class DashboardController extends Controller
 
     public function admin(Request $request)
     {
-        // range chart: 7 atau 30 hari
         $range = (int) $request->get('range', 30);
         $range = in_array($range, [7, 30]) ? $range : 30;
 
+        // ── CACHE ──
+        // Cache key unik per range & per hari — otomatis stale setiap hari
+        // TTL 5 menit agar data tidak terlalu basi saat transaksi berjalan
+        $cacheKey = "dashboard_admin_{$range}_" . today()->format('Ymd');
+        $ttl      = now()->addMinutes(5);
+
+        $data = Cache::remember($cacheKey, $ttl, function () use ($range) {
+            return $this->buildAdminData($range);
+        });
+
+        // Inject $range ke data (tidak di-cache karena hanya UI)
+        $data['range'] = $range;
+        $data['title'] = 'Dashboard';
+
+        return view('dashboard.admin', $data);
+    }
+
+    // =====================================================
+    // Semua query berat dikumpulkan di sini → di-cache
+    // =====================================================
+    private function buildAdminData(int $range): array
+    {
         $todayStart = now()->startOfDay();
         $todayEnd   = now()->endOfDay();
+        $from       = now()->subDays($range - 1)->startOfDay();
+        $to         = now()->endOfDay();
 
-        $from = now()->subDays($range - 1)->startOfDay();
-        $to   = now()->endOfDay();
-
-        // === 1) KPI Hari Ini (header transaksi) ===
+        // === 1) KPI Hari Ini ===
         $trxToday = DB::table('transactions as t')
             ->whereBetween('t.transaction_date', [$todayStart, $todayEnd])
-            ->where('t.status', 'paid');
+            ->where('t.status', 'PAID');
 
         $kpi = (clone $trxToday)
-            ->selectRaw('COALESCE(SUM(t.subtotal - COALESCE(t.potongan_voucher,0)),0) as net_sales_ex_tax')
+            ->selectRaw('COALESCE(SUM(t.total - COALESCE(t.tax_amount,0)),0) as net_sales_ex_tax')
             ->selectRaw('COALESCE(COUNT(t.id),0) as trx_count')
             ->selectRaw('COALESCE(SUM(COALESCE(t.tax_amount,0)),0) as tax_total')
             ->selectRaw('COALESCE(SUM(COALESCE(t.potongan_voucher,0)),0) as voucher_total')
             ->first();
 
-        // === 2) KPI Profit Hari Ini (butuh COGS dari detail; hindari double count header) ===
+        // === 2) Profit Hari Ini ===
         $detailAgg = DB::table('transaction_details')
             ->selectRaw('transaction_id')
             ->selectRaw('SUM(quantity * price_buy) as cogs')
@@ -51,45 +72,42 @@ class DashboardController extends Controller
         $profitToday = DB::table('transactions as t')
             ->joinSub($detailAgg, 'd', fn($j) => $j->on('d.transaction_id', '=', 't.id'))
             ->whereBetween('t.transaction_date', [$todayStart, $todayEnd])
-            ->where('t.status', 'paid')
-            ->selectRaw('COALESCE(SUM((t.subtotal - COALESCE(t.potongan_voucher,0)) - d.cogs),0) as gross_profit')
+            ->where('t.status', 'PAID')
+            ->selectRaw('COALESCE(SUM((t.total - COALESCE(t.tax_amount,0)) - d.cogs),0) as gross_profit')
             ->selectRaw('COALESCE(SUM(d.cogs),0) as cogs_total')
             ->first();
 
-        $aov = ($kpi->trx_count ?? 0) > 0 ? ($kpi->net_sales_ex_tax / $kpi->trx_count) : 0;
-        $margin = ($kpi->net_sales_ex_tax ?? 0) > 0 ? (($profitToday->gross_profit / $kpi->net_sales_ex_tax) * 100) : 0;
+        $aov    = ($kpi->trx_count ?? 0) > 0 ? ($kpi->net_sales_ex_tax / $kpi->trx_count) : 0;
+        $margin = ($kpi->net_sales_ex_tax ?? 0) > 0
+            ? ($profitToday->gross_profit / $kpi->net_sales_ex_tax * 100) : 0;
 
-        // === 3) Chart Sales & Profit (7/30 hari) ===
+        // === 3) Chart ===
         $chartRows = DB::table('transactions as t')
             ->joinSub($detailAgg, 'd', fn($j) => $j->on('d.transaction_id', '=', 't.id'))
             ->whereBetween('t.transaction_date', [$from, $to])
-            ->where('t.status', 'paid')
+            ->where('t.status', 'PAID')
             ->selectRaw('DATE(t.transaction_date) as day')
-            ->selectRaw('COALESCE(SUM(t.subtotal - COALESCE(t.potongan_voucher,0)),0) as net_sales_ex_tax')
-            ->selectRaw('COALESCE(SUM((t.subtotal - COALESCE(t.potongan_voucher,0)) - d.cogs),0) as gross_profit')
+            ->selectRaw('COALESCE(SUM(t.total - COALESCE(t.tax_amount,0)),0) as net_sales_ex_tax')
+            ->selectRaw('COALESCE(SUM((t.total - COALESCE(t.tax_amount,0)) - d.cogs),0) as gross_profit')
             ->groupByRaw('DATE(t.transaction_date)')
             ->orderBy('day')
             ->get();
 
-        // isi missing dates agar grafik rapi
         $map = $chartRows->keyBy('day');
-        $labels = [];
-        $sales = [];
-        $profits = [];
-
+        $labels = $sales = $profits = [];
         for ($i = 0; $i < $range; $i++) {
-            $day = $from->copy()->addDays($i)->toDateString();
+            $day      = $from->copy()->addDays($i)->toDateString();
             $labels[] = $day;
-            $sales[] = (float) ($map[$day]->net_sales_ex_tax ?? 0);
-            $profits[] = (float) ($map[$day]->gross_profit ?? 0);
+            $sales[]  = (float) ($map[$day]->net_sales_ex_tax ?? 0);
+            $profits[]= (float) ($map[$day]->gross_profit ?? 0);
         }
 
-        // === 4) Top Produk (30 hari) ===
+        // === 4) Top Produk ===
         $topProducts = DB::table('transaction_details as td')
             ->join('transactions as t', 't.id', '=', 'td.transaction_id')
             ->join('products as p', 'p.id', '=', 'td.product_id')
             ->whereBetween('t.transaction_date', [$from, $to])
-            ->where('t.status', 'paid')
+            ->where('t.status', 'PAID')
             ->groupBy('td.product_id', 'p.name')
             ->selectRaw('p.name')
             ->selectRaw('SUM(td.quantity) as qty')
@@ -99,39 +117,44 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        // === 5) Stok (stocklevels + products.min_stock) ===
+        // === 5) Stok ===
         $lowStockCount = DB::table('stocklevels as s')
             ->join('products as p', 'p.id', '=', 's.product_id')
             ->where('p.is_active', 1)
+            ->where('s.quantity', '>', 0)
             ->whereColumn('s.quantity', '<=', 'p.min_stock')
             ->count();
 
-        $outOfStockCount = DB::table('stocklevels as s')
-            ->join('products as p', 'p.id', '=', 's.product_id')
+        $outOfStockCount = DB::table('products as p')
+            ->leftJoin('stocklevels as s', 's.product_id', '=', 'p.id')
             ->where('p.is_active', 1)
-            ->where('s.quantity', '<=', 0)
+            ->where(function ($q) {
+                $q->whereNull('s.id')
+                  ->orWhere('s.quantity', '<=', 0);
+            })
             ->count();
 
         $lowStockList = DB::table('stocklevels as s')
             ->join('products as p', 'p.id', '=', 's.product_id')
             ->where('p.is_active', 1)
+            ->where('s.quantity', '>', 0)
             ->whereColumn('s.quantity', '<=', 'p.min_stock')
-            ->select('p.name', 'p.barcode', 'p.min_stock', 's.quantity')
+            ->select('p.id', 'p.name', 'p.barcode', 'p.min_stock', 's.quantity')
             ->orderBy('s.quantity')
             ->limit(7)
             ->get();
 
-        // === 6) Mutasi stok hari ini (stockmovements) ===
+        // === 6) Mutasi Stok ===
         $stockMoveToday = DB::table('stockmovements')
             ->whereBetween('created_at', [$todayStart, $todayEnd])
-            ->selectRaw("movement_type")
-            ->selectRaw("SUM(change_amount) as total_change")
-            ->groupBy('movement_type')
+            ->selectRaw('LOWER(movement_type) as movement_type')
+            ->selectRaw('SUM(change_amount) as total_change')
+            ->groupByRaw('LOWER(movement_type)')
             ->get()
             ->keyBy('movement_type');
 
-        $stockIn  = (float) ($stockMoveToday['in']->total_change ?? 0);
-        $stockOut = (float) ($stockMoveToday['OUT']->total_change ?? 0);
+        $stockIn  = (float) ($stockMoveToday['in']->total_change  ?? 0);
+        $stockOut = (float) ($stockMoveToday['out']->total_change ?? 0);
 
         $recentStockMoves = DB::table('stockmovements as sm')
             ->join('products as p', 'p.id', '=', 'sm.product_id')
@@ -140,7 +163,7 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        // === 7) Promo (diskon_produks & vouchers) ===
+        // === 7) Promo ===
         $activeVouchers = DB::table('vouchers')
             ->where('is_active', 1)
             ->whereDate('start_date', '<=', now()->toDateString())
@@ -160,28 +183,24 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        // === 8) Transaksi terbaru (global) ===
+        // === 8) Transaksi Terbaru ===
         $recentTransactions = DB::table('transactions as t')
             ->join('users as u', 'u.id', '=', 't.user_id')
             ->whereBetween('t.transaction_date', [$todayStart, $todayEnd])
             ->orderByDesc('t.transaction_date')
-            ->select('t.transaction_code', 't.transaction_date', 't.total', 't.status', 't.payment_method', 'u.name as cashier')
+            ->select('t.id', 't.transaction_code', 't.transaction_date', 't.total', 't.status', 't.payment_method', 'u.name as cashier')
             ->limit(10)
             ->get();
 
-        $title = 'Dashboard';
-
-        return view('dashboard.admin', compact(
-            'range', 'kpi', 'profitToday', 'aov', 'margin',
+        return compact(
+            'kpi', 'profitToday', 'aov', 'margin',
             'labels', 'sales', 'profits',
             'topProducts',
             'lowStockCount', 'outOfStockCount', 'lowStockList',
             'stockIn', 'stockOut', 'recentStockMoves',
             'activeVouchers', 'activeDiskon',
-            'title',
             'recentTransactions'
-
-        ));
+        );
     }
 
     public function kasir(Request $request)
@@ -191,14 +210,13 @@ class DashboardController extends Controller
         $todayStart = now()->startOfDay();
         $todayEnd   = now()->endOfDay();
 
-        // KPI kasir hari ini
         $trxToday = DB::table('transactions as t')
             ->whereBetween('t.transaction_date', [$todayStart, $todayEnd])
-            ->where('t.status', 'paid')
+            ->where('t.status', 'PAID')
             ->where('t.user_id', $userId);
 
         $kpi = (clone $trxToday)
-            ->selectRaw('COALESCE(SUM(t.subtotal - COALESCE(t.potongan_voucher,0)),0) as net_sales_ex_tax')
+            ->selectRaw('COALESCE(SUM(t.total - COALESCE(t.tax_amount,0)),0) as net_sales_ex_tax')
             ->selectRaw('COALESCE(COUNT(t.id),0) as trx_count')
             ->selectRaw('COALESCE(SUM(COALESCE(t.potongan_voucher,0)),0) as voucher_total')
             ->selectRaw('COALESCE(SUM(COALESCE(t.tax_amount,0)),0) as tax_total')
@@ -206,14 +224,12 @@ class DashboardController extends Controller
 
         $aov = ($kpi->trx_count ?? 0) > 0 ? ($kpi->net_sales_ex_tax / $kpi->trx_count) : 0;
 
-        // Metode pembayaran kasir hari ini
         $paymentBreakdown = (clone $trxToday)
             ->selectRaw('payment_method, COUNT(*) as cnt')
             ->groupBy('payment_method')
             ->orderByDesc('cnt')
             ->get();
 
-        // Transaksi per jam (kasir) hari ini
         $hourRows = (clone $trxToday)
             ->selectRaw('HOUR(t.transaction_date) as hour')
             ->selectRaw('COUNT(*) as cnt')
@@ -222,14 +238,12 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('hour');
 
-        $hourLabels = [];
-        $hourCounts = [];
+        $hourLabels = $hourCounts = [];
         for ($h = 0; $h <= 23; $h++) {
             $hourLabels[] = sprintf('%02d:00', $h);
             $hourCounts[] = (int) ($hourRows[$h]->cnt ?? 0);
         }
 
-        // Recent transaksi kasir
         $recentTransactions = DB::table('transactions')
             ->where('user_id', $userId)
             ->orderByDesc('transaction_date')
@@ -237,10 +251,10 @@ class DashboardController extends Controller
             ->limit(12)
             ->get();
 
-        // Alert stok menipis (ringkas)
         $lowStockList = DB::table('stocklevels as s')
             ->join('products as p', 'p.id', '=', 's.product_id')
             ->where('p.is_active', 1)
+            ->where('s.quantity', '>', 0)
             ->whereColumn('s.quantity', '<=', 'p.min_stock')
             ->select('p.name', 'p.barcode', 'p.min_stock', 's.quantity')
             ->orderBy('s.quantity')
@@ -250,12 +264,9 @@ class DashboardController extends Controller
         $title = 'Dashboard';
 
         return view('dashboard.kasir', compact(
-            'kpi', 'aov',
-            'paymentBreakdown',
-            'title',
+            'kpi', 'aov', 'paymentBreakdown', 'title',
             'hourLabels', 'hourCounts',
-            'recentTransactions',
-            'lowStockList'
+            'recentTransactions', 'lowStockList'
         ));
     }
 }

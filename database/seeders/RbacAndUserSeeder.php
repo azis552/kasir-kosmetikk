@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -11,205 +12,206 @@ use Spatie\Permission\PermissionRegistrar;
 class RbacAndUserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * =============================================================
+     * CARA MENAMBAH PERMISSION BARU:
+     *
+     * 1. Tambahkan entry di $routePermissions di bawah
+     * 2. Set role mana saja yang boleh akses: 'admin', 'kasir', atau keduanya
+     * 3. Jalankan: php artisan db:seed --class=RbacAndUserSeeder
+     *
+     * Format:
+     *   'nama.route' => ['admin', 'kasir'],   // admin & kasir boleh
+     *   'nama.route' => ['admin'],             // hanya admin
+     *   'nama.route' => ['kasir'],             // hanya kasir
+     * =============================================================
      */
+    private array $routePermissions = [
+
+        // -------------------------------------------------------
+        // SHARED — kasir & admin
+        // -------------------------------------------------------
+        'home'                  => ['admin', 'kasir'],
+        'dashboard.kasir'       => ['admin', 'kasir'],
+
+        // Kasir transaksi
+        'kasir.index'           => ['admin', 'kasir'],
+        'kasir.create'          => ['admin', 'kasir'],
+        'kasir.store'           => ['admin', 'kasir'],
+        'kasir.show'            => ['admin', 'kasir'],
+        'kasir.edit'            => ['admin', 'kasir'],
+        'kasir.update'          => ['admin', 'kasir'],
+        'kasir.destroy'         => ['admin', 'kasir'],
+        'kasir.tambahProduk'    => ['admin', 'kasir'],
+        'kasir.keranjang'       => ['admin', 'kasir'],
+        'kasir.updateDiskon'    => ['admin', 'kasir'],
+        'kasir.hapusKeranjang'  => ['admin', 'kasir'],
+        'kasir.qtyProduk'       => ['admin', 'kasir'],
+        'kasir.voucher'         => ['admin', 'kasir'],
+        'kasir.removeVoucher'   => ['admin', 'kasir'],
+        'kasir.bayar'           => ['admin', 'kasir'],
+        'kasir.cetak'           => ['admin', 'kasir'],
+        'kasir.batal'           => ['admin', 'kasir'],
+        'transaksis.riwayat'    => ['admin', 'kasir'],
+        'transaksis.show'       => ['admin', 'kasir'],
+
+        // -------------------------------------------------------
+        // ADMIN ONLY
+        // -------------------------------------------------------
+
+        // Dashboard
+        'dashboard.admin'           => ['admin'],
+
+        // User management
+        'users.index'               => ['admin'],
+        'users.create'              => ['admin'],
+        'users.store'               => ['admin'],
+        'users.edit'                => ['admin'],
+        'users.update'              => ['admin'],
+        'users.destroy'             => ['admin'],
+
+        // Role management
+        'roles.index'               => ['admin'],
+        'roles.create'              => ['admin'],
+        'roles.store'               => ['admin'],
+        'roles.show'                => ['admin'],
+        'roles.edit'                => ['admin'],
+        'roles.update'              => ['admin'],
+        'roles.destroy'             => ['admin'],
+
+        // Product categories
+        'product_categories.index'  => ['admin'],
+        'product_categories.create' => ['admin'],
+        'product_categories.store'  => ['admin'],
+        'product_categories.show'   => ['admin'],
+        'product_categories.edit'   => ['admin'],
+        'product_categories.update' => ['admin'],
+        'product_categories.destroy'=> ['admin'],
+
+        // Products
+        'products.index'            => ['admin'],
+        'products.create'           => ['admin'],
+        'products.store'            => ['admin'],
+        'products.show'             => ['admin'],
+        'products.edit'             => ['admin'],
+        'products.update'           => ['admin'],
+        'products.destroy'          => ['admin'],
+        'products.stock'            => ['admin'],
+        'products.updateStock'      => ['admin'],
+        'products.diskon'           => ['admin'],
+        'products.storeDiskon'      => ['admin'],
+        'products.stock-alert'      => ['admin'],
+
+        // Diskon
+        'diskon.index'              => ['admin'],
+        'diskon.create'             => ['admin'],
+        'diskon.store'              => ['admin'],
+        'diskon.show'               => ['admin'],
+        'diskon.edit'               => ['admin'],
+        'diskon.update'             => ['admin'],
+        'diskon.destroy'            => ['admin'],
+
+        // Vouchers
+        'vouchers.index'            => ['admin'],
+        'vouchers.create'           => ['admin'],
+        'vouchers.store'            => ['admin'],
+        'vouchers.show'             => ['admin'],
+        'vouchers.edit'             => ['admin'],
+        'vouchers.update'           => ['admin'],
+        'vouchers.destroy'          => ['admin'],
+
+        // Taxes
+        'taxes.index'               => ['admin'],
+        'taxes.create'              => ['admin'],
+        'taxes.store'               => ['admin'],
+        'taxes.show'                => ['admin'],
+        'taxes.edit'                => ['admin'],
+        'taxes.update'              => ['admin'],
+        'taxes.destroy'             => ['admin'],
+
+        // Laporan
+        'laporan.laporan_harian'    => ['admin'],
+        'laporan.laporan_bulanan'   => ['admin'],
+        'laporan.laporan_tahunan'   => ['admin'],
+        'laporan.laba_rugi_harian'  => ['admin'],
+        'laporan.laba_rugi_bulanan' => ['admin'],
+        'laporan.laba_rugi_tahunan' => ['admin'],
+
+        // Settings & theme
+        'settings.toko'             => ['admin'],
+        'settings.toko.update'      => ['admin'],
+        'admin.theme'               => ['admin'],
+        'admin.theme.update'        => ['admin'],
+
+        // Batal transaksi sudah bayar
+        'kasir.batal.paid'          => ['admin'],
+
+        // -------------------------------------------------------
+        // TAMBAHKAN PERMISSION BARU DI SINI
+        // Contoh:
+        // 'laporan.export'         => ['admin'],
+        // 'produk.import'          => ['admin', 'kasir'],
+        // -------------------------------------------------------
+    ];
+
     public function run(): void
     {
-        // Menghapus cache permissions
+        // Reset cache
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Definisikan permissions
-        // =========================
-// PERMISSIONS KASIR (sesuai route name)
-// =========================
-        $kasirPermissions = [
-            // home
-            'home',
-
-            // dashboard kasir
-            'dashboard.kasir',
-
-            // kasir custom actions
-            'kasir.tambahProduk',
-            'kasir.keranjang',
-            'kasir.updateDiskon',
-            'kasir.hapusKeranjang',
-            'kasir.qtyProduk',
-            'kasir.voucher',
-            'kasir.removeVoucher',
-            'kasir.bayar',
-            'kasir.cetak',
-            'kasir.batal',
-
-            // riwayat transaksi
-            'transaksis.riwayat',
-            'transaksis.show',
-
-            // resource kasir (Route::resource('kasir', ...))
-            'kasir.index',
-            'kasir.create',
-            'kasir.store',
-            'kasir.show',
-            'kasir.edit',
-            'kasir.update',
-            'kasir.destroy',
+        // Pastikan role ada
+        $roles = [
+            'admin' => Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']),
+            'kasir' => Role::firstOrCreate(['name' => 'kasir', 'guard_name' => 'web']),
         ];
 
+        // Kumpulkan permission per role
+        $permsByRole = ['admin' => [], 'kasir' => []];
 
-        // =========================
-// PERMISSIONS ADMIN (sesuai route name)
-// =========================
-        $adminPermissions = [
-            // home
-            'home',
-
-            // dashboard admin
-            'dashboard.admin',
-
-            // users (manual routes)
-            'users.index',
-            'users.create',
-            'users.store',
-            'users.edit',
-            'users.update',
-            'users.destroy',
-
-            // roles (resource)
-            'roles.index',
-            'roles.create',
-            'roles.store',
-            'roles.show',
-            'roles.edit',
-            'roles.update',
-            'roles.destroy',
-
-            // product_categories (resource)
-            'product_categories.index',
-            'product_categories.create',
-            'product_categories.store',
-            'product_categories.show',
-            'product_categories.edit',
-            'product_categories.update',
-            'product_categories.destroy',
-
-            // products custom
-            'products.storeDiskon',
-            'products.diskon',     
-            'products.updateStock',
-            'products.diskon',
-            'products.stock',
-
-            // products (resource)
-            'products.index',
-            'products.create',
-            'products.store',
-            'products.show',
-            'products.edit',
-            'products.update',
-            'products.destroy',
-            'products.stock-alert',
-
-            // diskon (resource)
-            'diskon.index',
-            'diskon.create',
-            'diskon.store',
-            'diskon.show',
-            'diskon.edit',
-            'diskon.update',
-            'diskon.destroy',
-
-            // vouchers (resource)
-            'vouchers.index',
-            'vouchers.create',
-            'vouchers.store',
-            'vouchers.show',
-            'vouchers.edit',
-            'vouchers.update',
-            'vouchers.destroy',
-
-            // taxes (resource)
-            'taxes.index',
-            'taxes.create',
-            'taxes.store',
-            'taxes.show',
-            'taxes.edit',
-            'taxes.update',
-            'taxes.destroy',
-
-            // laporan
-            'laporan.laporan_harian',
-            'laporan.laporan_bulanan',
-            'laporan.laporan_tahunan',
-
-            // laporan laba rugi
-            'laporan.laba_rugi_harian',
-            'laporan.laba_rugi_bulanan',
-            'laporan.laba_rugi_tahunan',
-
-            // settings toko
-            'settings.toko',
-            'settings.toko.update',
-            // theme
-            'admin.theme',
-            'admin.theme.update',
-            'kasir.batal.paid',
-        ];
-
-
-        // =========================
-// (Opsional) kalau admin juga boleh akses menu kasir
-// =========================
-        $adminPermissions = array_values(array_unique(array_merge($adminPermissions, $kasirPermissions)));
-
-
-        // =========================
-// ALL PERMISSIONS (opsional)
-// =========================
-        $permissions = array_values(array_unique(array_merge($adminPermissions, $kasirPermissions)));
-
-
-
-        // Membuat permissions jika belum ada
-        foreach ($permissions as $permission) {
+        foreach ($this->routePermissions as $permName => $allowedRoles) {
+            // Buat permission jika belum ada
             Permission::firstOrCreate([
-                'name' => $permission,
+                'name'       => $permName,
                 'guard_name' => 'web',
             ]);
+
+            foreach ($allowedRoles as $roleName) {
+                if (isset($permsByRole[$roleName])) {
+                    $permsByRole[$roleName][] = $permName;
+                }
+            }
         }
 
-        // Membuat role admin dan user jika belum ada
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $userRole = Role::firstOrCreate(['name' => 'kasir', 'guard_name' => 'web']);
+        // Sync permission ke masing-masing role
+        foreach ($roles as $roleName => $roleModel) {
+            $roleModel->syncPermissions($permsByRole[$roleName]);
+        }
 
-        // Menyinkronkan permissions dengan role admin
-        $adminRole->syncPermissions($adminPermissions);
+        // Buat user default jika belum ada
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name'     => 'admin',
+                'password' => Hash::make('password123'),
+            ]
+        );
+        $admin->syncRoles(['admin']);
 
-        // Role user biasa, bisa diberi permission tertentu jika diinginkan
-        $userRole->syncPermissions($kasirPermissions);
+        $kasir = User::firstOrCreate(
+            ['email' => 'user@example.com'],
+            [
+                'name'     => 'kasir',
+                'password' => Hash::make('password123'),
+            ]
+        );
+        $kasir->syncRoles(['kasir']);
 
-        // Membuat user default (admin)
-        $admin = User::firstOrCreate([
-            'name' => 'admin',
-            'email' => 'admin@example.com',
-        ], [
-            'password' => Hash::make('password123'),  // Pastikan mengganti dengan password yang lebih aman
-        ]);
-
-        // Menugaskan role 'admin' ke user default
-        $admin->assignRole('admin');
-
-        // Menambahkan user biasa jika diperlukan
-        $user = User::firstOrCreate([
-            'name' => 'kasir',
-            'email' => 'user@example.com',
-        ], [
-            'password' => Hash::make('password123'), // Ganti dengan password yang lebih aman
-        ]);
-
-        // Menugaskan role 'user' ke user biasa
-        $user->assignRole('kasir');
-
-        // Menghapus cache permissions setelah selesai
+        // Reset cache lagi setelah selesai
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $this->command->info('✅ Roles & permissions berhasil disinkronkan.');
+        $this->command->table(
+            ['Role', 'Jumlah Permission'],
+            collect($permsByRole)->map(fn($perms, $role) => [$role, count($perms)])->values()->toArray()
+        );
     }
 }

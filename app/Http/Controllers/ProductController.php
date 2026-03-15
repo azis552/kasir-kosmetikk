@@ -240,47 +240,45 @@ class ProductController extends Controller
 
         return redirect()->route('products.diskon', $productId)->with('success', 'Discount created successfully');
     }
-    public function stockAlert(Request $request)
-    {
-        $search = $request->get('search');
-        $filter = $request->get('filter', 'all'); // 'empty' atau 'low' atau 'all'
+public function stockAlert(Request $request)
+{
+    $search = $request->get('search');
+    $filter = $request->get('filter', 'all');
 
-        // Produk HABIS (stok = 0)
-        $emptyQuery = Products::query()
-            ->with(['category', 'stocklevel'])
-            ->whereHas('stocklevel', function ($q) {
-                $q->where('quantity', '<=', 0);
-            })
-            ->orWhereDoesntHave('stocklevel');
+    // ── STOK HABIS: tidak ada record stocklevel, ATAU quantity <= 0 ──
+    $emptyQuery = Products::query()
+        ->with(['category', 'stocklevel'])
+        ->where(function ($q) {
+            $q->whereDoesntHave('stocklevel')
+              ->orWhereHas('stocklevel', fn($s) => $s->where('quantity', '<=', 0));
+        });
 
-        // Produk HAMPIR HABIS (stok > 0 tapi <= min_stock)
-        $lowQuery = Products::query()
-            ->with(['category', 'stocklevel'])
-            ->whereHas('stocklevel', function ($q) {
-                $q->where('quantity', '>', 0);
-            })
-            ->whereColumn('min_stock', '>=', function ($q) {
-                $q->select('quantity')
-                    ->from('stocklevels')
-                    ->whereColumn('stocklevels.product_id', 'products.id')
-                    ->limit(1);
-            });
+    // ── HAMPIR HABIS: quantity > 0 DAN quantity <= min_stock ──
+    // Gunakan whereHas dengan subquery EXISTS — tidak perlu join manual
+    $lowQuery = Products::query()
+        ->with(['category', 'stocklevel'])
+        ->whereHas('stocklevel', function ($q) {
+            $q->where('quantity', '>', 0)
+              ->whereRaw('quantity <= (SELECT min_stock FROM products WHERE products.id = stocklevels.product_id LIMIT 1)');
+        });
 
-        if ($search) {
-            $emptyQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('barcode', 'like', "%{$search}%");
-            });
-            $lowQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('barcode', 'like', "%{$search}%");
-            });
-        }
-
-        $emptyProducts = $emptyQuery->get();
-        $lowProducts = $lowQuery->get();
-
-        $title = 'Stock Alert';
-        return view('products.stock-alert', compact('emptyProducts', 'lowProducts', 'filter', 'search', 'title'));
+    if ($search) {
+        $emptyQuery->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('barcode', 'like', "%{$search}%");
+        });
+        $lowQuery->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('barcode', 'like', "%{$search}%");
+        });
     }
+
+    $emptyProducts = $emptyQuery->get();
+    $lowProducts   = $lowQuery->get();
+
+    $title = 'Stock Alert';
+    return view('products.stock-alert', compact(
+        'emptyProducts', 'lowProducts', 'filter', 'search', 'title'
+    ));
+}
 }

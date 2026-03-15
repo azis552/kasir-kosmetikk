@@ -8,7 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class TransactionDetail extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+
+    // FIX: ganti guarded=[] dengan fillable eksplisit
+    protected $fillable = [
+        'transaction_id',
+        'product_id',
+        'quantity',
+        'price',
+        'price_buy',
+        'diskon_id',
+        'discount',
+        'line_total',
+    ];
 
     public function product()
     {
