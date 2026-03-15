@@ -66,6 +66,7 @@ Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function (
     Route::get('products/{product}/diskon', [ProductController::class, 'diskon'])->name('products.diskon');
     Route::put('products/updateStock/{product}', [ProductController::class, 'updateStock'])->name('products.updateStock');
     Route::get('products/{product}/stock', [ProductController::class, 'stock'])->name('products.stock');
+    Route::get('/products/stock-alert', [ProductController::class, 'stockAlert'])->name('products.stock-alert');
     Route::resource('diskon', DiskonController::class);
     Route::resource('vouchers', VoucherController::class);
     Route::resource('taxes', TaxController::class);

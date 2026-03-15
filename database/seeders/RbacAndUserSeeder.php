@@ -107,6 +107,7 @@ class RbacAndUserSeeder extends Seeder
             'products.edit',
             'products.update',
             'products.destroy',
+            'products.stock-alert',
 
             // diskon (resource)
             'diskon.index',

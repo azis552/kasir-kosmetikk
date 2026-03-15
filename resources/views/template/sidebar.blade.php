@@ -424,6 +424,12 @@
                                     <span class="pc-mtext">Produk</span>
                                 </a>
                             </li>
+                            <li class="pc-item {{ request()->is('products/stock-alert') ? 'active' : '' }}">
+                                <a href="{{ route('products.stock-alert') }}" class="pc-link">
+                                    <span class="pc-micon"><i class="ph ph-bell-simple"></i></span>
+                                    <span class="pc-mtext">Peringatan Stok Produk</span>
+                                </a>
+                            </li>
 
                             <li class="pc-item {{ request()->is('diskon*') ? 'active' : '' }}">
                                 <a href="{{ route('diskon.index') }}" class="pc-link">
