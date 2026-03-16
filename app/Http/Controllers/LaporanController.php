@@ -19,10 +19,9 @@ class LaporanController extends Controller
 
     private function queryTransaksi($start, $end, string $mode): array
     {
-        // Agregasi per transaksi — 1 query saja
+        // Query 1: agregasi ringkasan per transaksi
         $rows = DB::table('transactions as t')
             ->leftJoin('transaction_details as td', 'td.transaction_id', '=', 't.id')
-            ->leftJoin('products as p', 'p.id', '=', 'td.product_id')
             ->where('t.status', 'PAID')
             ->whereBetween('t.transaction_date', [$start, $end])
             ->groupBy(
@@ -43,7 +42,24 @@ class LaporanController extends Controller
             ->orderBy('t.transaction_date')
             ->get();
 
-        $reportData = $rows->map(function ($trx) use ($mode) {
+        // Query 2: semua detail produk dalam periode — 1 query, bukan N query
+        $trxIds  = $rows->pluck('id');
+        $details = DB::table('transaction_details as td')
+            ->join('products as p', 'p.id', '=', 'td.product_id')
+            ->whereIn('td.transaction_id', $trxIds)
+            ->select(
+                'td.transaction_id',
+                'td.quantity',
+                'td.price',
+                'td.price_buy',
+                'td.discount',
+                'td.line_total',
+                'p.name as product_name',
+            )
+            ->get()
+            ->groupBy('transaction_id'); // group by transaction_id untuk mapping
+
+        $reportData = $rows->map(function ($trx) use ($mode, $details) {
             $omzetBersih = $trx->omzetKotor - $trx->diskonProduk - $trx->voucher;
             $keuntungan  = $omzetBersih - $trx->totalHPP;
 
@@ -52,14 +68,14 @@ class LaporanController extends Controller
                 'waktu'            => $mode === 'harian'
                     ? date('H:i', strtotime($trx->transaction_date))
                     : $trx->transaction_date,
-                'details'          => collect(),
+                'details'          => $details->get($trx->id, collect()), // ✅ detail produk
                 'totalQty'         => (int) $trx->totalQty,
                 'omzetKotor'       => (float) $trx->omzetKotor,
                 'diskonProduk'     => (float) $trx->diskonProduk,
                 'voucher'          => (float) $trx->voucher,
                 'pajak'            => (float) $trx->pajak,
                 'omzetBersih'      => $omzetBersih,
-                'totalHPP'         => (float) $trx->totalHPP, // ✅ fix: tambahkan ini
+                'totalHPP'         => (float) $trx->totalHPP,
                 'keuntungan'       => $keuntungan,
             ];
         });

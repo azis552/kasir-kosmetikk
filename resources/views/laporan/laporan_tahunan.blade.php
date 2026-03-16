@@ -43,7 +43,7 @@
                                     <td class="text-center">{{ $no++ }}</td>
                                     <td>{{ $trx['transaction_code'] }}</td>
                                     <td class="text-center">{{ $trx['waktu'] }}</td>
-                                    <td>{{ $detail->product->name }}</td>
+                                    <td>{{ $detail->product_name }}</td>
                                     <td class="text-center">{{ $detail->quantity }}</td>
                                     <td class="text-end">
                                         Rp {{ number_format($detail->price, 0, ',', '.') }}
