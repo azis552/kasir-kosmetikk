@@ -14,6 +14,7 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\UserActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 // =====================================================
@@ -70,7 +71,9 @@ Route::middleware(['auth', 'role:admin', 'log.user.activity'])->group(function (
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-
+    // ----- Activity Log -----
+    Route::get('/activity-logs', [UserActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::delete('/activity-logs', [UserActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
     // ----- Role management -----
     Route::resource('roles', RoleController::class);
 

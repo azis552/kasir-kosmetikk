@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class KasirController extends Controller
@@ -25,6 +26,11 @@ class KasirController extends Controller
 
         $title = 'Kasir - Transaksi Penjualan';
         return view('kasir.index', compact('title'));
+    }
+    private function clearDashboardCache(): void
+    {
+        Cache::forget('dashboard_admin_7_' . today()->format('Ymd'));
+        Cache::forget('dashboard_admin_30_' . today()->format('Ymd'));
     }
 
     /**
@@ -471,7 +477,7 @@ class KasirController extends Controller
         });
         // Generate the receipt content
         $receiptContent = $this->generatePosReceipt($transaction, $details);
-
+        $this->clearDashboardCache();
         // Return the receipt content as a JSON response
         return response()->json([
             'success' => true,
@@ -676,7 +682,7 @@ class KasirController extends Controller
             // 4️⃣ Ubah status jadi VOID
             $transaction->status = 'VOID';
             $transaction->save();
-
+            $this->clearDashboardCache();
             DB::commit();
 
             return response()->json([

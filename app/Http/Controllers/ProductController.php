@@ -8,10 +8,16 @@ use App\Models\Stocklevel;
 use App\Models\Stockmovement;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
+    private function clearDashboardCache(): void
+    {
+        Cache::forget('dashboard_admin_7_' . today()->format('Ymd'));
+        Cache::forget('dashboard_admin_30_' . today()->format('Ymd'));
+    }
     /**
      * Display a listing of the resource.
      */
@@ -51,6 +57,7 @@ class ProductController extends Controller
     {
         $title = 'Product Management';
         $categories = ProductCategory::all();
+        $this->clearDashboardCache();
         return view('products.create', compact('title', 'categories'));
     }
 
@@ -79,6 +86,7 @@ class ProductController extends Controller
         }
 
         Products::create($request->all());
+        $this->clearDashboardCache();
 
         return redirect()->route('products.index')->with('success', 'Product created successfully');
     }
@@ -113,6 +121,7 @@ class ProductController extends Controller
         $request->merge(['price' => $price, 'price_buy' => $price_buy]);
         $product = Products::findOrFail($id);
         $product->update($request->all());
+        $this->clearDashboardCache();
         return redirect()->route('products.index')->with('success', 'Product updated successfully');
     }
 
@@ -192,6 +201,7 @@ class ProductController extends Controller
 
         $stock->quantity = $quantity_baru;
         $stock->save();
+        $this->clearDashboardCache();
 
         return redirect()->route('products.index')->with('success', 'Stock updated successfully');
     }

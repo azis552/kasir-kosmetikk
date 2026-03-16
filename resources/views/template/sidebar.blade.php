@@ -211,9 +211,8 @@
 
 <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" data-pc-theme="light">
     <!-- MODAL INFO -->
-<!-- MODAL INFO -->
-<div id="shortcutModal"
-     style="
+    <!-- MODAL INFO -->
+    <div id="shortcutModal" style="
         display:none;
         position:fixed;
         top:0;
@@ -224,7 +223,7 @@
         z-index:9998;
      ">
 
-    <div style="
+        <div style="
         background:#ffffff;
         width:600px;
         max-width:95%;
@@ -237,49 +236,49 @@
         font-weight:500;
     ">
 
-        <h4 style="color:#000;">📋 Shortcut Keyboard</h4>
-        <hr>
+            <h4 style="color:#000;">📋 Shortcut Keyboard</h4>
+            <hr>
 
-        <h6 style="color:#000;">Global</h6>
-        <ul style="color:#000;">
-            <li><b>ALT + D</b> → Dashboard</li>
-            <li><b>ALT + T</b> → Transaksi</li>
-            <li><b>ALT + R</b> → Riwayat</li>
-            <li><b>F10</b> → Logout</li>
-        </ul>
+            <h6 style="color:#000;">Global</h6>
+            <ul style="color:#000;">
+                <li><b>ALT + D</b> → Dashboard</li>
+                <li><b>ALT + T</b> → Transaksi</li>
+                <li><b>ALT + R</b> → Riwayat</li>
+                <li><b>F10</b> → Logout</li>
+            </ul>
 
-        <h6 style="color:#000;">Kasir</h6>
-        <ul style="color:#000;">
-            <li><b>ALT + N</b> → Fokus Barcode</li>
-            <li><b>ALT + J</b> → Fokus Voucher</li>
-            <li><b>ALT + C</b> → Apply Voucher</li>
-            <li><b>ALT + Q</b> → Fokus Bayar</li>
-            <li><b>ALT + M</b> → Metode Pembayaran</li>
-            <li><b>F9</b> → Proses Bayar</li>
-        </ul>
+            <h6 style="color:#000;">Kasir</h6>
+            <ul style="color:#000;">
+                <li><b>ALT + N</b> → Fokus Barcode</li>
+                <li><b>ALT + J</b> → Fokus Voucher</li>
+                <li><b>ALT + C</b> → Apply Voucher</li>
+                <li><b>ALT + Q</b> → Fokus Bayar</li>
+                <li><b>ALT + M</b> → Metode Pembayaran</li>
+                <li><b>F9</b> → Proses Bayar</li>
+            </ul>
 
-        <h6 style="color:#000;">Berpindah menu khusus admin</h6>
-        <ul style="color:#000;">
-            <li><b>ALT + U</b> → Users</li>
-            <li><b>ALT + O</b> → Roles</li>
-            <li><b>ALT + I</b> → Produk</li>
-            <li><b>ALT + K</b> → Kategori</li>
-            <li><b>ALT + V</b> → Voucher</li>
-            <li><b>ALT + H</b> → Laporan Harian</li>
-            <li><b>ALT + B</b> → Laporan Bulanan</li>
-            <li><b>ALT + Y</b> → Laporan Tahunan</li>
-            <li><b>ALT + L</b> → Laba Rugi</li>
-        </ul>
+            <h6 style="color:#000;">Berpindah menu khusus admin</h6>
+            <ul style="color:#000;">
+                <li><b>ALT + U</b> → Users</li>
+                <li><b>ALT + O</b> → Roles</li>
+                <li><b>ALT + I</b> → Produk</li>
+                <li><b>ALT + K</b> → Kategori</li>
+                <li><b>ALT + V</b> → Voucher</li>
+                <li><b>ALT + H</b> → Laporan Harian</li>
+                <li><b>ALT + B</b> → Laporan Bulanan</li>
+                <li><b>ALT + Y</b> → Laporan Tahunan</li>
+                <li><b>ALT + L</b> → Laba Rugi</li>
+            </ul>
 
-        <div style="text-align:right;">
-            <button id="closeShortcutModal"
+            <div style="text-align:right;">
+                <button id="closeShortcutModal"
                     style="padding:6px 15px;background:#dc3545;color:white;border:none;border-radius:5px;">
-                Tutup
-            </button>
-        </div>
+                    Tutup
+                </button>
+            </div>
 
+        </div>
     </div>
-</div>
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
         <div class="loader-track">
@@ -383,6 +382,12 @@
                                 <a href="{{ route('users.index') }}" class="pc-link">
                                     <span class="pc-micon"><i class="ph ph-user-gear"></i></span>
                                     <span class="pc-mtext">Akun Karyawan</span>
+                                </a>
+                            </li>
+                            <li class="pc-item {{ request()->is('activity-logs*') ? 'active' : '' }}">
+                                <a href="{{ route('activity-logs.index') }}" class="pc-link">
+                                    <span class="pc-micon"><i class="ph ph-activity"></i></span>
+                                    <span class="pc-mtext">Log Aktivitas</span>
                                 </a>
                             </li>
                         </ul>
