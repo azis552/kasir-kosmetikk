@@ -47,29 +47,31 @@
                                     <label for="price_buy" class="form-label">Harga Beli</label>
                                     <input type="number" class="form-control" name="price_buy" id="price_buy" min="0"
                                         required oninput="
-                    const sell = document.getElementById('price_sell');
-                    if (sell.value !== '' && Number(this.value) >= Number(sell.value)) {
-                        this.setCustomValidity('HPP harus lebih rendah dari harga jual');
-                    } else {
-                        this.setCustomValidity('');
-                        sell.setCustomValidity('');
-                    }
-                ">
+                            const sell = document.getElementById('price_sell');
+                            if (sell.value !== '' && Number(this.value) >= Number(sell.value)) {
+                                this.setCustomValidity('HPP harus lebih rendah dari harga jual');
+                            } else {
+                                this.setCustomValidity('');
+                                sell.setCustomValidity('');
+                            }
+                        ">
                                 </div>
 
                                 <div class="col-md-4">
                                     <label for="price_sell" class="form-label">Harga Jual</label>
                                     <input type="number" class="form-control" name="price_sell" id="price_sell" min="1"
                                         required oninput="
-                    const buy = document.getElementById('price_buy');
-                    if (buy.value !== '' && Number(this.value) <= Number(buy.value)) {
-                        this.setCustomValidity('Harga jual harus lebih tinggi dari HPP');
-                    } else {
-                        this.setCustomValidity('');
-                        buy.setCustomValidity('');
-                    }
-                ">
+                            const buy = document.getElementById('price_buy');
+                            if (buy.value !== '' && Number(this.value) <= Number(buy.value)) {
+                                this.setCustomValidity('Harga jual harus lebih tinggi dari HPP');
+                            } else {
+                                this.setCustomValidity('');
+                                buy.setCustomValidity('');
+                            }
+                        ">
                                 </div>
+
+
 
                                 <div class="col-md-4">
                                     <label for="min_stock" class="form-label">Min Stok</label>
@@ -77,47 +79,41 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="min_stock" class="form-label">Min Stok</label>
-                                <input type="number" class="form-control" name="min_stock" id="min_stock" required>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="unit" class="form-label">Satuan</label>
+                                    <input type="text" class="form-control" name="unit" id="unit" value="pcs" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-control" name="is_active" id="is_active" required>
+                                        <option value="1" selected>Aktif</option>
+                                        <option value="0">Tidak Aktif</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="unit" class="form-label">Satuan</label>
-                                <input type="text" class="form-control" name="unit" id="unit" value="pcs" required>
+                            <div class="row mb-3">
+
+                                <div class="col-md-6">
+                                    <label for="sku" class="form-label">SKU <span>(Opsional)</span></label>
+                                    <input type="text" class="form-control" name="sku" id="sku">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="category_id" class="form-label">Kategori Produk</label>
+                                    <select class="form-control" name="category_id" id="category_id" required>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div><small class="text-muted">
+                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                                </small>
                             </div>
-                            <div class="col-md-6">
-                                <label for="status" class="form-label">Status</label>
-                                <select class="form-control" name="is_active" id="is_active" required>
-                                    <option value="1" selected>Aktif</option>
-                                    <option value="0">Tidak Aktif</option>
-                                </select>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success btn-lg w-100 mt-3">Simpan</button>
                             </div>
-                        </div>
-
-                        <div class="row mb-3">
-
-                            <div class="col-md-6">
-                                <label for="sku" class="form-label">SKU <span>(Opsional)</span></label>
-                                <input type="text" class="form-control" name="sku" id="sku">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="category_id" class="form-label">Kategori Produk</label>
-                                <select class="form-control" name="category_id" id="category_id" required>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div><small class="text-muted">
-                                Tekan <strong>Enter</strong> untuk langsung menyimpan.
-                            </small>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-lg w-100 mt-3">Simpan</button>
-                        </div>
                     </form>
 
 
