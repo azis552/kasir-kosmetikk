@@ -123,7 +123,7 @@
                             </td>
                         @endif
 
-                        <td>{{ $item->product->name }}</td>
+                        <td>{{ $item->product_name ?? '-' }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ App\Helpers\FormatHelper::formatRupiah($item->price) }}</td>
                         <td>{{ App\Helpers\FormatHelper::formatRupiah($item->price * $item->quantity) }}</td>

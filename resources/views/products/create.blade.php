@@ -29,7 +29,7 @@
                         <h4 class="mb-4">Tambah Produk</h4>
 
                         <div class="row mb-3">
-                             <div class="col-md-6">
+                            <div class="col-md-6">
                                 <label for="barcode" class="form-label">Barcode</label>
                                 <input type="text" class="form-control" autofocus name="barcode" id="barcode">
                                 <span>Contoh: 123456789 </span>
@@ -38,19 +38,45 @@
                                 <label for="name" class="form-label">Nama Produk</label>
                                 <input type="text" class="form-control" name="name" id="name" required>
                             </div>
-                          
+
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="HargaBeli" class="form-label">Harga Beli</label>
-                                <input type="number" class="form-control" name="price_buy" id="price_buy" required>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="price_buy" class="form-label">Harga Beli</label>
+                                    <input type="number" class="form-control" name="price_buy" id="price_buy" min="0"
+                                        required oninput="
+                    const sell = document.getElementById('price_sell');
+                    if (sell.value !== '' && Number(this.value) >= Number(sell.value)) {
+                        this.setCustomValidity('HPP harus lebih rendah dari harga jual');
+                    } else {
+                        this.setCustomValidity('');
+                        sell.setCustomValidity('');
+                    }
+                ">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="price_sell" class="form-label">Harga Jual</label>
+                                    <input type="number" class="form-control" name="price_sell" id="price_sell" min="1"
+                                        required oninput="
+                    const buy = document.getElementById('price_buy');
+                    if (buy.value !== '' && Number(this.value) <= Number(buy.value)) {
+                        this.setCustomValidity('Harga jual harus lebih tinggi dari HPP');
+                    } else {
+                        this.setCustomValidity('');
+                        buy.setCustomValidity('');
+                    }
+                ">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="min_stock" class="form-label">Min Stok</label>
+                                    <input type="number" class="form-control" name="min_stock" id="min_stock" required>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <label for="price" class="form-label">Harga Jual</label>
-                                <input type="number" class="form-control" name="price_sell" id="price" required>
-                            </div>
-                            
+
                             <div class="col-md-4">
                                 <label for="min_stock" class="form-label">Min Stok</label>
                                 <input type="number" class="form-control" name="min_stock" id="min_stock" required>
@@ -72,12 +98,12 @@
                         </div>
 
                         <div class="row mb-3">
-                            
+
                             <div class="col-md-6">
                                 <label for="sku" class="form-label">SKU <span>(Opsional)</span></label>
                                 <input type="text" class="form-control" name="sku" id="sku">
                             </div>
-                             <div class="col-md-6">
+                            <div class="col-md-6">
                                 <label for="category_id" class="form-label">Kategori Produk</label>
                                 <select class="form-control" name="category_id" id="category_id" required>
                                     @foreach ($categories as $category)
@@ -85,8 +111,8 @@
                                     @endforeach
                                 </select>
                             </div><small class="text-muted">
-                                    Tekan <strong>Enter</strong> untuk langsung menyimpan.
-                                </small>
+                                Tekan <strong>Enter</strong> untuk langsung menyimpan.
+                            </small>
                         </div>
 
                         <div class="text-center">
@@ -108,7 +134,7 @@
 @section('script')
     Tambahkan Script untuk Masking
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Apply Inputmask for the price field with prefix 'Rp' and thousands separator
             Inputmask({
                 alias: "numeric",
@@ -120,7 +146,7 @@
             }).mask('#price');
         });
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Apply Inputmask for the price field with prefix 'Rp' and thousands separator
             Inputmask({
                 alias: "numeric",

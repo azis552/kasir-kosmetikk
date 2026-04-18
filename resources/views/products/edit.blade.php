@@ -46,19 +46,48 @@
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label for="price_buy" class="form-label">Harga Beli</label>
-                                <input type="number" class="form-control"
-                                    value="{{ $product->price_buy }}"
-                                    placeholder="{{ App\Helpers\FormatHelper::formatRupiah($product->price_buy) }}"
-                                    name="price_buy" id="price_buy" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="price_sell" class="form-label">Harga Jual</label>
-                                <input type="number" class="form-control"
-                                    value="{{ $product->price }}"
-                                    placeholder="{{ App\Helpers\FormatHelper::formatRupiah($product->price) }}"
-                                    name="price_sell" id="price_sell" required>
-                            </div>
+        <label for="price_buy" class="form-label">Harga Beli</label>
+        <input
+            type="number"
+            class="form-control"
+            name="price_buy"
+            id="price_buy"
+            value="{{ $product->price_buy }}"
+            min="0"
+            required
+            oninput="
+                const sell = document.getElementById('price_sell');
+                if (sell.value !== '' && Number(this.value) >= Number(sell.value)) {
+                    this.setCustomValidity('HPP harus lebih rendah dari harga jual');
+                } else {
+                    this.setCustomValidity('');
+                    sell.setCustomValidity('');
+                }
+            "
+        >
+    </div>
+
+    <div class="col-md-4">
+        <label for="price_sell" class="form-label">Harga Jual</label>
+        <input
+            type="number"
+            class="form-control"
+            name="price_sell"
+            id="price_sell"
+            value="{{ $product->price }}"
+            min="1"
+            required
+            oninput="
+                const buy = document.getElementById('price_buy');
+                if (buy.value !== '' && Number(this.value) <= Number(buy.value)) {
+                    this.setCustomValidity('Harga jual harus lebih tinggi dari HPP');
+                } else {
+                    this.setCustomValidity('');
+                    buy.setCustomValidity('');
+                }
+            "
+        >
+    </div>
                             <div class="col-md-4">
                                 <label for="min_stock" class="form-label">Min Stok</label>
                                 <input type="number" class="form-control" name="min_stock"
